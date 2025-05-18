@@ -68,7 +68,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 const props = defineProps(["product"]);
 const selectedSize = ref(props.product.size[0]); // mặc định chọn size đầu tiên

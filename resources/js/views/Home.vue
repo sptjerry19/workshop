@@ -12,6 +12,7 @@
 </template>
 
 <script setup>
+import { defineComponent } from 'vue'
 import Header from "../components/Header.vue";
 import Banner from "../components/Banner.vue";
 import CategoryList from "../components/CategoryList.vue";
@@ -98,7 +99,7 @@ const products = [
         id: 8,
         name: "Chuối",
         image: "https://img.freepik.com/free-photo/banana_144627-15417.jpg",
-        price: 180000, // có thể là giá mặc định hoặc bỏ đi nếu không cần
+        price: 180000,
         size: [
             { label: "S", price: 100000 },
             { label: "M", price: 150000 },
@@ -106,4 +107,8 @@ const products = [
         ],
     },
 ];
+
+defineComponent({
+    name: 'Home'
+})
 </script>

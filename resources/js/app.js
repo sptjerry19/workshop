@@ -2,13 +2,18 @@ import "./bootstrap";
 import { createApp } from "vue";
 import App from "./App.vue";
 import "./tailwind.css";
-import { createRouter, createWebHistory } from "vue-router";
-import Home from "./views/Home.vue";
+import router from './router'
+import axios from 'axios'
 
-const routes = [{ path: "/", component: Home }];
-const router = createRouter({
-    history: createWebHistory(),
-    routes,
-});
+// Cấu hình axios
+axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
+axios.defaults.withCredentials = true
 
-createApp(App).use(router).mount("#app");
+// Tạo Vue app
+const app = createApp(App)
+
+// Sử dụng router
+app.use(router)
+
+// Mount app
+app.mount('#app')
