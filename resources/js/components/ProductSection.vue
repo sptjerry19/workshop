@@ -27,7 +27,7 @@
                 Khuyến mãi
             </div>
         </div>
-        <div class="flex flex-wrap gap-6">
+        <div class="flex gap-6">
             <!-- Left big promo block -->
             <div
                 class="flex flex-col justify-between bg-[#6B8443] text-white rounded-md p-6 w-[280px] h-[480px] shrink-0"
@@ -53,15 +53,129 @@
                 />
             </div>
             <!-- Right product grid -->
-            <div class="flex-1 grid grid-cols-5 gap-x-6 gap-y-8">
-                <!-- Products -->
-                <ProductCard v-for="p in products" :key="p.id" :product="p" />
+            <div class="flex-1 overflow-hidden">
+                <div
+                    v-if="!products || products.length === 0"
+                    class="text-center py-8"
+                >
+                    Không có sản phẩm nào
+                </div>
+                <div v-else>
+                    <!-- First two rows -->
+                    <div class="grid grid-cols-5 gap-6 mb-6">
+                        <ProductCard
+                            v-for="p in displayedProducts"
+                            :key="p.id"
+                            :product="p"
+                        />
+                    </div>
+
+                    <!-- View more button -->
+                    <div class="flex justify-center mt-4">
+                        <router-link
+                            to="/products"
+                            class="inline-flex items-center px-6 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                            Xem thêm
+                            <svg
+                                class="ml-2 -mr-1 w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 5l7 7-7 7"
+                                />
+                            </svg>
+                        </router-link>
+                    </div>
+
+                    <!-- Slide controls -->
+                    <div class="flex justify-center gap-4 mt-4">
+                        <button
+                            @click="prevSlide"
+                            class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
+                            :disabled="currentSlide === 0"
+                        >
+                            <svg
+                                class="w-6 h-6"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M15 19l-7-7 7-7"
+                                />
+                            </svg>
+                        </button>
+                        <button
+                            @click="nextSlide"
+                            class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
+                            :disabled="currentSlide >= maxSlides"
+                        >
+                            <svg
+                                class="w-6 h-6"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 5l7 7-7 7"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
+import { ref, computed } from "vue";
 import ProductCard from "./ProductCard.vue";
-defineProps(["title", "products"]);
+
+const props = defineProps(["title", "products"]);
+const currentSlide = ref(0);
+const productsPerPage = 10; // 5 products per row * 2 rows
+
+const maxSlides = computed(() => {
+    if (!props.products) return 0;
+    return Math.ceil(props.products.length / productsPerPage) - 1;
+});
+
+const displayedProducts = computed(() => {
+    if (!props.products) return [];
+    const start = currentSlide.value * productsPerPage;
+    return props.products.slice(start, start + productsPerPage);
+});
+
+const nextSlide = () => {
+    if (currentSlide.value < maxSlides.value) {
+        currentSlide.value++;
+    }
+};
+
+const prevSlide = () => {
+    if (currentSlide.value > 0) {
+        currentSlide.value--;
+    }
+};
+
+// Debug
+console.log("ProductSection props:", props);
+console.log("Products in ProductSection:", props.products);
 </script>
+
+<style>
+/* Remove any unnecessary styles */
+</style>

@@ -3,10 +3,18 @@
 namespace App\Services;
 
 use App\Models\Product;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
 class ProductService extends BaseService
 {
+    protected Model $model;
+
+    public function __construct()
+    {
+        $this->model = new Product();
+    }
+
     public function getProducts(array $params)
     {
         $keyword = $params['q'] ?? null;
@@ -33,5 +41,33 @@ class ProductService extends BaseService
             Log::error($e->getMessage());
             return false;
         }
+    }
+
+    public function getProductById($id)
+    {
+        try {
+            return Product::with('category')->find($id);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return false;
+        }
+    }
+    public function createProduct(array $data)
+    {
+        try {
+            return $this->create($data);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return false;
+        }
+    }
+    public function updateProduct(Product $product, array $data)
+    {
+        $product->update($data);
+        return $product;
+    }
+    public function deleteProduct(Product $product)
+    {
+        return $product->delete();
     }
 }

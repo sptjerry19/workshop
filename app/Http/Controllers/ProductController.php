@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\APIResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Product\StoreRequest;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Services\ProductService;
@@ -36,43 +37,24 @@ class ProductController extends Controller
         return ApiResponse::success($result['items'], 'Fetched successfully', 200, $result['pagination']);
     }
 
-    public function store(Request $request)
+    public function store(StoreRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'image' => 'required|string',
-            'price' => 'required|numeric|min:0',
-            'size' => 'nullable|array',
-            'size.*.label' => 'required|string',
-            'size.*.price' => 'required|numeric|min:0',
-            'description' => 'required|string',
-            'category_id' => 'required|exists:categories,id',
-            'stock' => 'required|integer|min:0',
-            'discount' => 'nullable|numeric|min:0'
-        ]);
+        $fields = $request->validated();
 
-        $product = Product::create($validated);
-        return response()->json($product, 201);
+        $product = $this->productService->createProduct($fields);
+        if (!$product) {
+            return ApiResponse::error('Failed to create product', 500);
+        }
+        return ApiResponse::success($product->transform(), 'Product created successfully', 200);
     }
 
     public function show(Product $product)
     {
-        $product->load('category');
-        return response()->json([
-            'id' => $product->id,
-            'name' => $product->name,
-            'image' => $product->image,
-            'price' => $product->price,
-            'size' => $product->size,
-            'sold' => $product->sold,
-            'rating' => $product->rating,
-            'reviews' => $product->reviews,
-            'description' => $product->description,
-            'category_id' => $product->category_id,
-            'category_name' => $product->category->name,
-            'stock' => $product->stock,
-            'discount' => $product->discount,
-        ]);
+        $product = $this->productService->getProductById($product->id);
+        if (!$product) {
+            return ApiResponse::error('Product not found', 404);
+        }
+        return ApiResponse::success($product->transform(), 'Product fetched successfully', 200);
     }
 
     public function update(Request $request, Product $product)
