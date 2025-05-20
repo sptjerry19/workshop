@@ -23,7 +23,7 @@ return new class extends Migration
             $table->text('description');
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->integer('stock')->default(0);
-            $table->decimal('discount', 5, 2)->nullable();
+            $table->decimal('discount', 10, 2)->nullable();
             $table->timestamps();
         });
     }

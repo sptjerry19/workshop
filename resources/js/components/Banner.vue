@@ -160,29 +160,74 @@
                 </button>
                 <ul class="flex space-x-6 text-sm font-medium text-gray-800">
                     <li>
-                        <a
-                            class="border-b-2 border-black pb-1 inline-block font-semibold"
-                            href="#"
+                        <router-link
+                            to="/"
+                            :class="[
+                                'pb-1 inline-block',
+                                $route.path === '/'
+                                    ? 'border-b-2 border-black font-semibold'
+                                    : 'hover:underline',
+                            ]"
                         >
                             Trang chủ
-                        </a>
+                        </router-link>
                     </li>
                     <li>
-                        <a class="hover:underline" href="#"> Giới thiệu </a>
+                        <router-link
+                            to="/about"
+                            :class="[
+                                'pb-1 inline-block',
+                                $route.path === '/about'
+                                    ? 'border-b-2 border-black font-semibold'
+                                    : 'hover:underline',
+                            ]"
+                        >
+                            Giới thiệu
+                        </router-link>
                     </li>
                     <li>
-                        <a class="hover:underline" href="#"> Sản phẩm </a>
+                        <router-link
+                            to="/products"
+                            :class="[
+                                'pb-1 inline-block',
+                                $route.path === '/products'
+                                    ? 'border-b-2 border-black font-semibold'
+                                    : 'hover:underline',
+                            ]"
+                        >
+                            Sản phẩm
+                        </router-link>
                     </li>
                     <li>
-                        <a class="hover:underline" href="#"> Tin tức </a>
+                        <router-link
+                            to="/news"
+                            :class="[
+                                'pb-1 inline-block',
+                                $route.path === '/news'
+                                    ? 'border-b-2 border-black font-semibold'
+                                    : 'hover:underline',
+                            ]"
+                        >
+                            Tin tức
+                        </router-link>
                     </li>
                     <li>
-                        <a class="hover:underline" href="#"> Liên hệ </a>
+                        <router-link
+                            to="/contact"
+                            :class="[
+                                'pb-1 inline-block',
+                                $route.path === '/contact'
+                                    ? 'border-b-2 border-black font-semibold'
+                                    : 'hover:underline',
+                            ]"
+                        >
+                            Liên hệ
+                        </router-link>
                     </li>
                 </ul>
             </nav>
         </header>
-        <main class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        <main v-if="$route.path === '/'" class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 mt-6">
             <section
                 class="flex flex-col lg:flex-row gap-6 bg-[#f9f9f9] rounded-md overflow-hidden"
             >
