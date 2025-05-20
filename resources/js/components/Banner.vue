@@ -1,6 +1,8 @@
 <template>
     <div class="bg-white">
-        <header class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+        <header
+            class="fixed top-0 left-0 right-0 bg-white z-50 max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8"
+        >
             <div
                 class="flex items-center justify-between py-6 border-b border-gray-200"
             >
@@ -134,13 +136,18 @@
                     >
                         <i class="far fa-user-circle"> </i>
                     </button>
-                    <button
+                    <router-link
+                        to="/cart"
+                        class="relative hover:text-black transition"
                         aria-label="Shopping bag"
-                        class="hover:text-black transition"
-                        type="button"
                     >
-                        <i class="far fa-shopping-bag"> </i>
-                    </button>
+                        <i class="far fa-shopping-bag"></i>
+                        <span
+                            v-if="cartCount > 0"
+                            class="absolute -top-2 -right-2 bg-[#d80000] text-white text-xs rounded-full px-1.5"
+                            >{{ cartCount }}</span
+                        >
+                    </router-link>
                     <button
                         aria-label="Favorites"
                         class="hover:text-black transition"
@@ -228,7 +235,7 @@
         </header>
         <main
             v-if="$route.path === '/'"
-            class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 mt-6"
+            class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 mt-6 pt-32"
         >
             <section
                 class="flex flex-col lg:flex-row gap-6 bg-[#f9f9f9] rounded-md overflow-hidden"
@@ -249,23 +256,24 @@
                         <h2
                             class="text-2xl sm:text-3xl font-extrabold text-gray-900 max-w-md"
                         >
-                            <span> Trang trại </span>
-                            <span class="text-[#6DA544] font-normal">
-                                Thực phẩm
+                            <span> Nấu ăn bằng </span>
+                            <span class="text-[#078a83] font-normal">
+                                tình yêu
                                 <br />
-                                tươi sạch &amp;
+                                thưởng thức
                             </span>
-                            <span> 100% Hữu cơ </span>
+                            <span> bằng niềm vui. </span>
                         </h2>
                         <p class="text-gray-400 text-xs mt-2 max-w-xs">
                             Alway fresh organic products for you
                         </p>
-                        <button
+                        <router-link
+                            to="/products"
                             class="mt-6 bg-[#6DA544] text-white text-xs font-semibold px-5 py-2 rounded-md w-max"
                             type="button"
                         >
                             MUA NGAY
-                        </button>
+                        </router-link>
                     </div>
                 </div>
                 <div
@@ -374,6 +382,41 @@
 
 <script>
 export default {
-    name: "MonaFruit",
+    name: "CheeseCake",
+    data() {
+        return {
+            cartCount: 0,
+        };
+    },
+    mounted() {
+        this.updateCartCount();
+
+        // Nếu có nhiều tab, sẽ bắt được sự kiện thay đổi localStorage
+        window.addEventListener("storage", this.updateCartCount);
+
+        // Optionally: Có thể tạo một custom event để dùng trong cùng tab
+        window.addEventListener("cart-updated", this.updateCartCount);
+    },
+    beforeUnmount() {
+        window.removeEventListener("storage", this.updateCartCount);
+        window.removeEventListener("cart-updated", this.updateCartCount);
+    },
+    methods: {
+        updateCartCount() {
+            const data = localStorage.getItem("cartItems");
+            if (!data) {
+                this.cartCount = 0;
+                return;
+            }
+            try {
+                this.cartCount = JSON.parse(data).reduce(
+                    (sum, item) => sum + item.quantity,
+                    0
+                );
+            } catch {
+                this.cartCount = 0;
+            }
+        },
+    },
 };
 </script>

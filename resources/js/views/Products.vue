@@ -1,6 +1,6 @@
 <template>
     <Banner />
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-40">
         <div
             v-for="(group, categoryId) in groupedProducts"
             :key="categoryId"
@@ -115,6 +115,9 @@
                         </p>
                         <button
                             class="mt-auto w-full bg-gray-200 text-gray-700 rounded-b-md py-2 font-semibold text-sm group-hover:bg-[#d80000] group-hover:text-white transition"
+                            @click="
+                                addToCart(product, selectedSizes[product.id])
+                            "
                         >
                             Thêm
                         </button>
@@ -132,8 +135,20 @@ import api from "../api.js";
 
 const products = ref([]);
 const selectedSizes = ref({});
+const cartItems = ref([]);
+
+// Load cart from localStorage
+function loadCart() {
+    const data = localStorage.getItem("cartItems");
+    cartItems.value = data ? JSON.parse(data) : [];
+}
+function saveCart() {
+    localStorage.setItem("cartItems", JSON.stringify(cartItems.value));
+    window.dispatchEvent(new Event("cart-updated"));
+}
 
 onMounted(async () => {
+    loadCart();
     try {
         const response = await api.get("/products");
         products.value = response.data.data;
@@ -182,6 +197,30 @@ function getDiscountedPrice(product, size) {
 
 function selectSize(productId, size) {
     selectedSizes.value[productId] = size;
+}
+
+function addToCart(product, size) {
+    // Tìm xem đã có sản phẩm này (id + size) trong giỏ chưa
+    const key = size ? `${product.id}_${size.label}` : `${product.id}`;
+    const idx = cartItems.value.findIndex((item) => item.key === key);
+    if (idx !== -1) {
+        cartItems.value[idx].quantity += 1;
+    } else {
+        cartItems.value.push({
+            key,
+            id: product.id,
+            name: product.name,
+            image: product.image,
+            size: size ? { ...size } : null,
+            price: size ? size.price : Number(product.price),
+            discount: parseFloat(product.discount),
+            quantity: 1,
+            description: product.description,
+        });
+    }
+    saveCart();
+    // Phát sự kiện để các component khác cập nhật
+    window.dispatchEvent(new Event("cart-updated"));
 }
 </script>
 

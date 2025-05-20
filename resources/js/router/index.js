@@ -7,6 +7,7 @@ import About from "../views/About.vue";
 import Products from "../views/Products.vue";
 import News from "../views/News.vue";
 import Contact from "../views/Contact.vue";
+import Cart from "../views/Cart.vue";
 
 const routes = [
     {
@@ -14,6 +15,11 @@ const routes = [
         name: "home",
         component: Home,
         meta: { requiresAuth: false },
+    },
+    {
+        path: "/cart",
+        name: "cart",
+        component: Cart,
     },
     {
         path: "/login",
