@@ -11,7 +11,9 @@
             >
                 {{ group[0]?.category_name || "Danh mục" }}
             </h2>
-            <div class="flex flex-wrap justify-center gap-6">
+            <div
+                class="flex flex-wrap justify-start gap-6 w-full max-w-[960px] mx-auto"
+            >
                 <div
                     v-for="product in group"
                     :key="product.id"

@@ -4,7 +4,7 @@
             <div
                 class="flex items-center justify-between py-6 border-b border-gray-200"
             >
-                <div class="flex items-center space-x-6">
+                <router-link to="/" class="flex items-center space-x-6">
                     <div class="flex items-center space-x-1">
                         <h1
                             class="text-2xl font-extrabold text-black flex items-center gap-1"
@@ -106,7 +106,7 @@
                             </svg>
                         </h1>
                     </div>
-                </div>
+                </router-link>
                 <form
                     aria-label="Site search"
                     class="flex flex-1 max-w-4xl mx-6"
@@ -155,8 +155,7 @@
                     class="flex items-center gap-2 bg-[#6DA544] text-white text-xs font-semibold px-5 py-3 rounded-md"
                     type="button"
                 >
-                    <i class="fas fa-bars text-sm"> </i>
-                    DANH MỤC SẢN PHẨM
+                    DANH MỤC
                 </button>
                 <ul class="flex space-x-6 text-sm font-medium text-gray-800">
                     <li>
@@ -227,7 +226,10 @@
                 </ul>
             </nav>
         </header>
-        <main v-if="$route.path === '/'" class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        <main
+            v-if="$route.path === '/'"
+            class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 mt-6"
+        >
             <section
                 class="flex flex-col lg:flex-row gap-6 bg-[#f9f9f9] rounded-md overflow-hidden"
             >

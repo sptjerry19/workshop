@@ -25,7 +25,8 @@ class ProductController extends Controller
             'sort_by',
             'sort_order',
             'per_page',
-            'take'
+            'take',
+            'category_id'
         ]);
 
         $result = $this->productService->getProducts($params);
