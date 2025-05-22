@@ -64,6 +64,15 @@ class Common
         return env('RESPONE_IMAGE_URL') . $path;
     }
 
+    public static function generateQr(?float $amount, ?string $descrition, ?string $accountName): string
+    {
+        if (empty($amount) || empty($descrition)) {
+            return 'https://img.vietqr.io/image/MB-011911142003-compact2.png';
+        }
+        return 'https://img.vietqr.io/image/MB-011911142003-compact2.png' .
+            '?amount=' . $amount . '&addInfo=' . $descrition . '&accountName=' . $accountName;
+    }
+
 
     public static function getPagination($items, $perPage = 10)
     {

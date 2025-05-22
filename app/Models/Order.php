@@ -30,6 +30,24 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function transform()
+    {
+        return [
+            'id' => $this->id,
+            'order_number' => $this->order_number,
+            'customer_name' => $this->customer_name,
+            'customer_phone' => $this->customer_phone,
+            'customer_address' => $this->customer_address,
+            'total_amount' => $this->total_amount,
+            'payment_method' => $this->payment_method,
+            'payment_status' => $this->payment_status,
+            'order_status' => $this->order_status,
+            'items' => $this->items,
+            'notes' => $this->notes,
+            'created_at' => $this->created_at,
+        ];
+    }
+
     protected static function boot()
     {
         parent::boot();

@@ -179,14 +179,32 @@
                     <div class="flex-1 flex justify-between sm:hidden">
                         <button
                             @click="prevPage"
-                            :disabled="!products.prev_page_url"
+                            :disabled="products.pagination.current_page <= 1"
                             class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                         >
                             Previous
                         </button>
+                        <div class="ml-4 flex items-center space-x-1">
+                            <button
+                                v-for="page in pages"
+                                :key="page"
+                                @click="goToPage(page)"
+                                :class="[
+                                    'px-3 py-1 border text-sm font-medium rounded-md',
+                                    page === products.pagination.current_page
+                                        ? 'bg-blue-500 text-white'
+                                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50',
+                                ]"
+                            >
+                                {{ page }}
+                            </button>
+                        </div>
                         <button
                             @click="nextPage"
-                            :disabled="!products.next_page_url"
+                            :disabled="
+                                products.pagination.current_page >=
+                                products.pagination.last_page
+                            "
                             class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                         >
                             Next
@@ -197,19 +215,18 @@
                     >
                         <div>
                             <p class="text-sm text-gray-700">
-                                Showing
+                                Page
                                 <span class="font-medium">{{
-                                    products.from
-                                }}</span>
-                                to
-                                <span class="font-medium">{{
-                                    products.to
+                                    products.pagination.current_page
                                 }}</span>
                                 of
                                 <span class="font-medium">{{
-                                    products.total
+                                    products.pagination.last_page
                                 }}</span>
-                                results
+                                — Total:
+                                <span class="font-medium">{{
+                                    products.pagination.total
+                                }}</span>
                             </p>
                         </div>
                         <div>
@@ -473,18 +490,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import AdminLayout from "@/layouts/AdminLayout.vue";
 import axios from "axios";
 
 const products = ref({
     data: [],
-    current_page: 1,
-    from: 0,
-    to: 0,
-    total: 0,
-    prev_page_url: null,
-    next_page_url: null,
+    pagination: {
+        total: 0,
+        per_page: 10,
+        current_page: 1,
+        last_page: 1,
+    },
 });
 
 const categories = ref([]);
@@ -514,6 +531,31 @@ const form = ref({
     discount: null, // percent or price
 });
 
+const pages = computed(() => {
+    const total = products.value.pagination.last_page;
+    const current = products.value.pagination.current_page;
+
+    // Giới hạn số lượng trang hiển thị (ví dụ 5 trang quanh trang hiện tại)
+    const delta = 2;
+    const range = [];
+
+    const start = Math.max(1, current - delta);
+    const end = Math.min(total, current + delta);
+
+    for (let i = start; i <= end; i++) {
+        range.push(i);
+    }
+
+    return range;
+});
+
+function goToPage(page) {
+    if (page !== products.value.pagination.current_page) {
+        products.value.pagination.current_page = page;
+        fetchProducts();
+    }
+}
+
 // Thêm một size mới
 const addSize = () => {
     form.value.size.push({ label: "", price: 0 });
@@ -537,13 +579,14 @@ async function fetchProducts() {
         if (filters.value.status) params.append("status", filters.value.status);
         if (filters.value.search) params.append("q", filters.value.search);
         if (products.value.current_page > 1)
-            params.append("page", products.value.current_page);
+            params.append("page", products.value.pagination.current_page);
 
         const response = await axios.get(
             `/api/admin/products?${params.toString()}`
         );
         if (response.data.success) {
-            products.value = response.data;
+            products.value.data = response.data.data;
+            products.value.pagination = response.data.pagination;
         }
     } catch (error) {
         console.error("Failed to fetch products:", error);
@@ -624,15 +667,18 @@ function closeModal() {
 }
 
 function prevPage() {
-    if (products.value.prev_page_url) {
-        products.value.current_page--;
+    if (products.value.pagination.current_page > 1) {
+        products.value.pagination.current_page--;
         fetchProducts();
     }
 }
 
 function nextPage() {
-    if (products.value.next_page_url) {
-        products.value.current_page++;
+    if (
+        products.value.pagination.current_page <
+        products.value.pagination.last_page
+    ) {
+        products.value.pagination.current_page++;
         fetchProducts();
     }
 }

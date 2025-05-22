@@ -178,6 +178,15 @@
                         Thanh toán nhanh chóng và an toàn qua ví Momo
                     </div>
                 </button>
+                <button
+                    @click="handlePaymentMethod('bank')"
+                    class="w-full p-4 border rounded-lg hover:bg-gray-50 text-left"
+                >
+                    <div class="font-medium">Thanh toán qua ngân hàng</div>
+                    <div class="text-sm text-gray-500">
+                        Quét mã QR để chuyển khoản ngân hàng
+                    </div>
+                </button>
             </div>
         </div>
     </div>
@@ -268,6 +277,39 @@
             </div>
         </div>
     </div>
+
+    <!-- Bank QR Modal -->
+    <div
+        v-if="showBankQR"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    >
+        <div class="bg-white rounded-lg p-6 w-full max-w-md">
+            <h2 class="text-xl font-bold mb-4">Quét mã QR để chuyển khoản</h2>
+            <div class="text-center">
+                <img :src="bankQRUrl" alt="Bank QR Code" class="mx-auto mb-4" />
+                <p class="text-sm text-gray-500 mb-4">
+                    Vui lòng chuyển khoản đúng số tiền và nội dung
+                </p>
+                <p class="text-lg font-bold text-[#d80000]">
+                    {{ formatPrice(totalPrice) }}
+                </p>
+            </div>
+            <div class="mt-6 flex justify-end space-x-2">
+                <button
+                    @click="showBankQR = false"
+                    class="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50"
+                >
+                    Đóng
+                </button>
+                <button
+                    @click="confirmBankPayment"
+                    class="px-4 py-2 bg-[#078a83] text-white rounded-md hover:bg-[#056e6b]"
+                >
+                    Tôi đã chuyển khoản
+                </button>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script setup>
@@ -289,6 +331,8 @@ const customerInfo = ref({
 const showOrderResult = ref(false);
 const orderSuccess = ref(false);
 const orderErrorMessage = ref("");
+const bankQRUrl = ref(""); // URL ảnh QR trả về từ server
+const showBankQR = ref(false); // Hiển thị modal ngân hàng
 
 function loadCart() {
     const data = localStorage.getItem("cartItems");
@@ -356,6 +400,11 @@ async function handleCustomerInfoSubmit() {
 }
 
 async function handlePaymentMethod(method) {
+    if (method === "bank") {
+        await createBankQR();
+        return;
+    }
+
     try {
         const orderData = {
             items: cartItems.value,
@@ -367,22 +416,17 @@ async function handlePaymentMethod(method) {
         const response = await axios.post("/api/orders", orderData);
 
         if (response.data.success) {
-            // Clear cart
             cartItems.value = [];
             saveCart();
-
-            // Show success modal
             orderSuccess.value = true;
             showOrderResult.value = true;
             showPaymentOptions.value = false;
 
-            // If payment method is momo, proceed with payment
             if (method === "momo") {
                 await createMomoPayment();
             }
         }
     } catch (error) {
-        console.error("Error creating order:", error);
         orderSuccess.value = false;
         orderErrorMessage.value =
             error.response?.data?.message ||
@@ -390,6 +434,59 @@ async function handlePaymentMethod(method) {
         showOrderResult.value = true;
         showPaymentOptions.value = false;
     }
+}
+
+async function createBankQR() {
+    try {
+        const response = await axios.post("/api/orders/generate", {
+            order_number: generateOrderNumber(), // Tự tạo mã đơn tạm
+            amount: totalPrice.value,
+        });
+
+        console.log(response.data.success);
+
+        if (response.data.success) {
+            console.log(response.data.data);
+            bankQRUrl.value = response.data.data; // Giả sử trả về URL QR
+            showPaymentOptions.value = false;
+            showBankQR.value = true;
+        }
+    } catch (error) {
+        console.error("Không tạo được mã QR ngân hàng:", error);
+    }
+}
+
+async function confirmBankPayment() {
+    try {
+        const orderData = {
+            items: cartItems.value,
+            customer: customerInfo.value,
+            total: totalPrice.value,
+            payment_method: "bank",
+        };
+
+        const response = await axios.post("/api/orders", orderData);
+
+        if (response.data.success) {
+            cartItems.value = [];
+            saveCart();
+            orderSuccess.value = true;
+            showOrderResult.value = true;
+            showBankQR.value = false;
+        }
+    } catch (error) {
+        orderSuccess.value = false;
+        orderErrorMessage.value =
+            error.response?.data?.message ||
+            "Có lỗi xảy ra khi đặt hàng. Vui lòng thử lại.";
+        showOrderResult.value = true;
+        showBankQR.value = false;
+    }
+}
+
+function generateOrderNumber() {
+    const now = new Date();
+    return "ORDER_" + now.getTime(); // Hoặc thêm prefix bạn muốn
 }
 
 async function createMomoPayment() {

@@ -48,7 +48,7 @@ class CategoryController extends Controller
         ]);
 
         $category = Category::create($validated);
-        return response()->json($category, 201);
+        return APIResponse::success($category, 'Category created successfully');
     }
 
     /**
@@ -79,6 +79,6 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         $category->delete();
-        return response()->json(null, 204);
+        return APIResponse::success([], 'Category deleted successfully', 200);
     }
 }

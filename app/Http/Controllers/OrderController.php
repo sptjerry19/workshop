@@ -2,58 +2,41 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\APIResponse;
+use App\Helpers\Common;
+use App\Http\Requests\Order\StoreRequest;
 use App\Models\Order;
+use App\Services\OrderService;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redis;
 
 class OrderController extends Controller
 {
-    public function store(Request $request)
+    protected $orderService;
+    public function __construct(OrderService $orderService)
+    {
+        $this->orderService = $orderService;
+    }
+    /**
+     * Store a newly created order in storage.
+     */
+    public function store(StoreRequest $request)
     {
         try {
-            $validated = $request->validate([
-                'items' => 'required|array',
-                'customer' => 'required|array',
-                'customer.name' => 'required|string|max:255',
-                'customer.phone' => 'required|string|max:20',
-                'customer.address' => 'required|string',
-                'total' => 'required|numeric|min:0',
-                'payment_method' => 'required|string|in:cod,momo'
-            ]);
+            $fields = $request->validated();
 
-            $order = Order::create([
-                'customer_name' => $validated['customer']['name'],
-                'customer_phone' => $validated['customer']['phone'],
-                'customer_address' => $validated['customer']['address'],
-                'total_amount' => $validated['total'],
-                'payment_method' => $validated['payment_method'],
-                'items' => $validated['items'],
-                'payment_status' => $validated['payment_method'] === 'cod' ? 'pending' : 'pending',
-                'order_status' => 'pending'
-            ]);
+            $order = $this->orderService->createOrder($fields);
 
-            Log::info('New order created', [
-                'order_id' => $order->id,
-                'order_number' => $order->order_number,
-                'payment_method' => $order->payment_method
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Order created successfully',
-                'order' => $order
-            ]);
+            return APIResponse::success($order, 'create order success');
         } catch (\Exception $e) {
             Log::error('Error creating order', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to create order',
-                'error' => $e->getMessage()
-            ], 500);
+            return APIResponse::error('create order failed', 500);
         }
     }
 
@@ -90,39 +73,46 @@ class OrderController extends Controller
                 'new_status' => $validated
             ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Order status updated successfully',
-                'order' => $order
-            ]);
+            return APIResponse::success([], 'Order status updated successfully', 200);
         } catch (\Exception $e) {
             Log::error('Error updating order status', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update order status',
-                'error' => $e->getMessage()
-            ], 500);
+            return APIResponse::error('Failed to update order status', 500);
         }
     }
 
-    public function index()
+    public function index(Request $request)
+    {
+        $params = $request->only([
+            'q',
+            'status',
+            'payment_status',
+        ]);
+
+        $orders = $this->orderService->getOrders($params);
+        if (!$orders) {
+            return APIResponse::error('Failed to fetch orders', 500);
+        }
+        return APIResponse::success($orders['items'], 'Orders fetched successfully', 200, $orders['pagination']);
+    }
+
+    public function generateQr(Request $request)
     {
         try {
-            $orders = Order::latest()->paginate(10);
-            return response()->json([
-                'success' => true,
-                'orders' => $orders
+            $params = $request->only([
+                'order_number',
+                'amount',
             ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to fetch orders',
-                'error' => $e->getMessage()
-            ], 500);
+            $amout = $params['amount'] ?? 0;
+            $description = 'Thanh toán đơn hàng ' . $params['order_number'] ?? '';
+            $accountName = 'Pham Duy Linh';
+            return APIResponse::success(Common::generateQr($amout, $description, $accountName), 'QR code generated successfully', 200);
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return APIResponse::error('Failed to generate QR code', 500);
         }
     }
 }

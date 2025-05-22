@@ -173,14 +173,32 @@
                     <div class="flex-1 flex justify-between sm:hidden">
                         <button
                             @click="prevPage"
-                            :disabled="!orders.prev_page_url"
+                            :disabled="orders.pagination.current_page <= 1"
                             class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                         >
                             Previous
                         </button>
+                        <div class="ml-4 flex items-center space-x-1">
+                            <button
+                                v-for="page in pages"
+                                :key="page"
+                                @click="goToPage(page)"
+                                :class="[
+                                    'px-3 py-1 border text-sm font-medium rounded-md',
+                                    page === orders.pagination.current_page
+                                        ? 'bg-blue-500 text-white'
+                                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50',
+                                ]"
+                            >
+                                {{ page }}
+                            </button>
+                        </div>
                         <button
                             @click="nextPage"
-                            :disabled="!orders.next_page_url"
+                            :disabled="
+                                orders.pagination.current_page >=
+                                orders.pagination.last_page
+                            "
                             class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                         >
                             Next
@@ -191,17 +209,18 @@
                     >
                         <div>
                             <p class="text-sm text-gray-700">
-                                Showing
+                                Page
                                 <span class="font-medium">{{
-                                    orders.from
+                                    orders.pagination.current_page
                                 }}</span>
-                                to
-                                <span class="font-medium">{{ orders.to }}</span>
                                 of
                                 <span class="font-medium">{{
-                                    orders.total
+                                    orders.pagination.last_page
                                 }}</span>
-                                results
+                                — Total:
+                                <span class="font-medium">{{
+                                    orders.pagination.total
+                                }}</span>
                             </p>
                         </div>
                         <div>
@@ -382,18 +401,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import AdminLayout from "@/layouts/AdminLayout.vue";
 import axios from "axios";
 
 const orders = ref({
     data: [],
-    current_page: 1,
-    from: 0,
-    to: 0,
-    total: 0,
-    prev_page_url: null,
-    next_page_url: null,
+    pagination: {
+        total: 0,
+        per_page: 10,
+        current_page: 1,
+        last_page: 1,
+    },
 });
 
 const filters = ref({
@@ -410,28 +429,59 @@ const updateData = ref({
     payment_status: "",
 });
 
+const pages = computed(() => {
+    const total = orders.value.pagination.last_page;
+    const current = orders.value.pagination.current_page;
+
+    // Giới hạn số lượng trang hiển thị (ví dụ 5 trang quanh trang hiện tại)
+    const delta = 2;
+    const range = [];
+
+    const start = Math.max(1, current - delta);
+    const end = Math.min(total, current + delta);
+
+    for (let i = start; i <= end; i++) {
+        range.push(i);
+    }
+
+    return range;
+});
+
+function goToPage(page) {
+    if (page !== orders.value.pagination.current_page) {
+        orders.value.pagination.current_page = page;
+        fetchOrders();
+    }
+}
+
 onMounted(() => {
     fetchOrders();
+
+    setInterval(() => {
+        fetchOrders();
+    }, 30000); // 30 giây
 });
 
 async function fetchOrders() {
+    console.log("🔄 Fetching orders...");
     try {
         const params = new URLSearchParams();
         if (filters.value.status) params.append("status", filters.value.status);
         if (filters.value.payment_status)
             params.append("payment_status", filters.value.payment_status);
-        if (filters.value.search) params.append("search", filters.value.search);
-        if (orders.value.current_page > 1)
-            params.append("page", orders.value.current_page);
+        if (filters.value.search) params.append("q", filters.value.search);
+        params.append("page", orders.value.pagination.current_page);
 
         const response = await axios.get(
             `/api/admin/orders?${params.toString()}`
         );
         if (response.data.success) {
-            orders.value = response.data.data;
+            console.log("✅ Orders fetched");
+            orders.value.data = response.data.data;
+            orders.value.pagination = response.data.pagination;
         }
     } catch (error) {
-        console.error("Failed to fetch orders:", error);
+        console.error("❌ Failed to fetch orders:", error);
     }
 }
 
@@ -468,15 +518,17 @@ async function updateOrderStatus() {
 }
 
 function prevPage() {
-    if (orders.value.prev_page_url) {
-        orders.value.current_page--;
+    if (orders.value.pagination.current_page > 1) {
+        orders.value.pagination.current_page--;
         fetchOrders();
     }
 }
 
 function nextPage() {
-    if (orders.value.next_page_url) {
-        orders.value.current_page++;
+    if (
+        orders.value.pagination.current_page < orders.value.pagination.last_page
+    ) {
+        orders.value.pagination.current_page++;
         fetchOrders();
     }
 }

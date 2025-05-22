@@ -242,6 +242,8 @@ async function submitForm() {
             status: form.value.status,
         });
 
+        console.log(response.data);
+
         if (response.data.success) {
             closeModal();
             fetchCategories();

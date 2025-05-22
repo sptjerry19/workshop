@@ -52,8 +52,9 @@ Route::apiResource('products', ProductController::class);
 Route::prefix('orders')->group(function () {
     Route::get('/', [OrderController::class, 'index']);
     Route::post('/', [OrderController::class, 'store']);
-    Route::get('/{id}', [OrderController::class, 'show']);
-    Route::patch('/{id}/status', [OrderController::class, 'updateStatus']);
+    // Route::get('/{id}', [OrderController::class, 'show']);
+    // Route::get('/generateQr', [OrderController::class, 'generateQr']);
+    Route::post('/generate', [OrderController::class, 'generateQr']);
 });
 
 // Admin routes
@@ -63,9 +64,12 @@ Route::prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard']);
 
     // Orders
-    Route::get('/orders', [AdminController::class, 'orders']);
-    Route::get('/orders/{order}', [AdminController::class, 'showOrder']);
-    Route::put('/orders/{order}', [AdminController::class, 'updateOrder']);
+    Route::group(['prefix' => 'orders'], function () {
+        Route::get('/', [OrderController::class, 'index']);
+        Route::get('/{order}', [OrderController::class, 'show']);
+        Route::put('/{order}', [OrderController::class, 'update']);
+        Route::patch('/{id}/status', [OrderController::class, 'updateStatus']);
+    });
 
     // Products
     Route::get('/products', [ProductController::class, 'index']);
