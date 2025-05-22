@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\APIResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Product\StoreRequest;
+use App\Http\Requests\Product\UpdateRequest;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Services\ProductService;
@@ -26,7 +27,6 @@ class ProductController extends Controller
             'sort_order',
             'per_page',
             'take',
-            'category_id'
         ]);
 
         $result = $this->productService->getProducts($params);
@@ -58,23 +58,17 @@ class ProductController extends Controller
         return ApiResponse::success($product->transform(), 'Product fetched successfully', 200);
     }
 
-    public function update(Request $request, Product $product)
+    public function update(UpdateRequest $request, string $id)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'image' => 'required|string',
-            'price' => 'required|numeric|min:0',
-            'size' => 'nullable|array',
-            'size.*.label' => 'required|string',
-            'size.*.price' => 'required|numeric|min:0',
-            'description' => 'required|string',
-            'category_id' => 'required|exists:categories,id',
-            'stock' => 'required|integer|min:0',
-            'discount' => 'nullable|numeric|min:0'
-        ]);
+        $fields = $request->validated();
+        $product = $this->productService->getProductById($id);
+        if (!$product) {
+            return ApiResponse::error('Product not found', 404);
+        }
 
-        $product->update($validated);
-        return response()->json($product);
+        $updatedProduct = $this->productService->updateProduct($product, $fields);
+
+        return ApiResponse::success($updatedProduct->transform(), 'Product updated successfully', 200);
     }
 
     public function destroy(Product $product)

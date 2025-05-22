@@ -2,19 +2,39 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\APIResponse;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Category;
+use App\Services\CategoryService;
 
 class CategoryController extends Controller
 {
+    protected $categoryService;
+    public function __construct(CategoryService $categoryService)
+    {
+        $this->categoryService = $categoryService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $categories = Category::all();
-        return response()->json($categories);
+        $categories = $this->categoryService->getAll();
+        if (!$categories) {
+            return APIResponse::error('Failed to fetch categories', 500);
+        }
+        return APIResponse::success($categories['items'], 'Categories fetched successfully', 200, $categories['pagination']);
+    }
+
+    public function select()
+    {
+        $categories = $this->categoryService->getSelect();
+        if (!$categories) {
+            return APIResponse::error('Failed to fetch categories', 500);
+        }
+        return APIResponse::success($categories, 'Categories fetched successfully');
     }
 
     /**
@@ -28,7 +48,7 @@ class CategoryController extends Controller
         ]);
 
         $category = Category::create($validated);
-        return response()->json($category, 201);
+        return APIResponse::success($category, 'Category created successfully');
     }
 
     /**
@@ -59,6 +79,6 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         $category->delete();
-        return response()->json(null, 204);
+        return APIResponse::success([], 'Category deleted successfully', 200);
     }
 }

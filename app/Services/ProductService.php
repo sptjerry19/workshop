@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\Common;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
@@ -55,6 +56,15 @@ class ProductService extends BaseService
     public function createProduct(array $data)
     {
         try {
+            if (!empty($data['image'])) {
+                $path = Common::storeBase64Image($data['image']);
+                if ($path) {
+                    $data['image'] = $path;
+                } else {
+                    throw new \Exception('Invalid base64 image data.');
+                }
+            }
+
             return $this->create($data);
         } catch (\Exception $e) {
             Log::error($e->getMessage());
@@ -63,6 +73,19 @@ class ProductService extends BaseService
     }
     public function updateProduct(Product $product, array $data)
     {
+        // Kiểm tra nếu tồn tại key 'image'
+        if (isset($data['image'])) {
+            $image = $data['image'];
+
+            // Nếu là base64 image
+            if (preg_match('/^data:image\/(\w+);base64,/', $image)) {
+                $data['image'] = Common::storeBase64Image($image);
+            } else {
+                // Nếu không phải base64 (có thể là đường dẫn cũ) => giữ nguyên
+                unset($data['image']);
+            }
+        }
+
         $product->update($data);
         return $product;
     }

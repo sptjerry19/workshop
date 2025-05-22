@@ -18,4 +18,17 @@ class Category extends Model
     {
         return $this->hasMany(Product::class);
     }
+
+    public function transform()
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'description' => $this->description,
+            'status' => $this->status,
+            'products_count' => $this->products()->count(),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+        ];
+    }
 }
