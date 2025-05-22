@@ -288,7 +288,7 @@
                         </router-link>
                     </div>
                 </div>
-                <div
+                <!-- <div
                     class="w-full lg:w-[360px] bg-[#f7bb40] rounded-md p-6 flex flex-col justify-center relative"
                 >
                     <h3 class="text-xl font-bold text-[#6DA544]">
@@ -306,7 +306,7 @@
                     >
                         MUA NGAY
                     </button>
-                </div>
+                </div> -->
             </section>
             <section
                 class="mt-16 flex flex-wrap justify-center gap-12 max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8"

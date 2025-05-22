@@ -23,11 +23,13 @@
                         <div
                             class="relative w-full h-[180px] overflow-hidden group"
                         >
-                            <img
-                                :alt="product.name"
-                                class="w-full h-full object-cover rounded-md transition-transform duration-300 group-hover:scale-105"
-                                :src="product.image"
-                            />
+                            <router-link :to="`/products/${product.id}`">
+                                <img
+                                    :alt="product.name"
+                                    class="w-full h-full object-cover rounded-md transition-transform duration-300 group-hover:scale-105"
+                                    :src="product.image"
+                                />
+                            </router-link>
                             <div
                                 v-if="parseFloat(product.discount) > 0"
                                 class="absolute top-2 left-2 bg-[#d80000] text-white text-xs font-bold px-2 py-1 rounded"
