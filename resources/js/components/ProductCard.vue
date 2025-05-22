@@ -44,19 +44,26 @@
         <div class="mt-3 w-full flex justify-between items-center text-sm">
             <div class="font-semibold truncate">{{ product.name }}</div>
             <div class="text-gray-700">
-                {{ selectedSize.price.toLocaleString() }}₫
+                {{
+                    selectedSize
+                        ? selectedSize.price.toLocaleString()
+                        : product.price.toLocaleString()
+                }}₫
             </div>
         </div>
 
         <!-- Sizes -->
-        <div class="mt-2 w-full flex justify-end gap-2 text-gray-400 text-xs">
+        <div
+            v-if="product.size && product.size.length > 0"
+            class="mt-2 w-full flex justify-end gap-2 text-gray-400 text-xs"
+        >
             <div
                 v-for="(s, index) in product.size"
                 :key="index"
                 class="border border-gray-300 rounded-full w-6 h-6 flex items-center justify-center cursor-pointer transition hover:bg-gray-200 hover:border-gray-500"
                 :class="{
                     'bg-gray-300 border-gray-600 text-black':
-                        selectedSize.label === s.label,
+                        selectedSize?.label === s.label,
                 }"
                 :title="s.label"
                 @click="selectedSize = s"
@@ -68,16 +75,24 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
 
 const props = defineProps(["product"]);
-const selectedSize = ref(props.product.size[0]); // mặc định chọn size đầu tiên
+const selectedSize = ref(null);
+
+onMounted(() => {
+    if (props.product?.size?.length > 0) {
+        selectedSize.value = props.product.size[0];
+    }
+});
 
 // Nếu muốn theo dõi props thay đổi (nếu product là động)
 watch(
     () => props.product,
     (newProduct) => {
-        selectedSize.value = { ...newProduct.size[0] };
+        if (newProduct?.size?.length > 0) {
+            selectedSize.value = { ...newProduct.size[0] };
+        }
     }
 );
 </script>

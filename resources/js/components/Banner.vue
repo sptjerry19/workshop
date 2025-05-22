@@ -1,15 +1,17 @@
 <template>
     <div class="bg-white">
-        <header class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+        <header
+            class="fixed top-0 left-0 right-0 bg-white z-50 max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8"
+        >
             <div
                 class="flex items-center justify-between py-6 border-b border-gray-200"
             >
-                <div class="flex items-center space-x-6">
+                <router-link to="/" class="flex items-center space-x-6">
                     <div class="flex items-center space-x-1">
                         <h1
                             class="text-2xl font-extrabold text-black flex items-center gap-1"
                         >
-                            <span> Cheese Cake </span>
+                            <span> CheeseCake </span>
                             <svg
                                 width="64px"
                                 height="64px"
@@ -106,7 +108,7 @@
                             </svg>
                         </h1>
                     </div>
-                </div>
+                </router-link>
                 <form
                     aria-label="Site search"
                     class="flex flex-1 max-w-4xl mx-6"
@@ -127,7 +129,32 @@
                     </button>
                 </form>
                 <div class="flex items-center space-x-6 text-gray-600 text-lg">
-                    <UserMenu />
+                    <button
+                        aria-label="User account"
+                        class="hover:text-black transition"
+                        type="button"
+                    >
+                        <i class="far fa-user-circle"> </i>
+                    </button>
+                    <router-link
+                        to="/cart"
+                        class="relative hover:text-black transition"
+                        aria-label="Shopping bag"
+                    >
+                        <i class="far fa-shopping-bag"></i>
+                        <span
+                            v-if="cartCount > 0"
+                            class="absolute -top-2 -right-2 bg-[#d80000] text-white text-xs rounded-full px-1.5"
+                            >{{ cartCount }}</span
+                        >
+                    </router-link>
+                    <button
+                        aria-label="Favorites"
+                        class="hover:text-black transition"
+                        type="button"
+                    >
+                        <i class="far fa-heart"> </i>
+                    </button>
                 </div>
             </div>
             <nav class="flex items-center space-x-4 border-b border-gray-200">
@@ -135,34 +162,81 @@
                     class="flex items-center gap-2 bg-[#6DA544] text-white text-xs font-semibold px-5 py-3 rounded-md"
                     type="button"
                 >
-                    <i class="fas fa-bars text-sm"> </i>
-                    DANH MỤC SẢN PHẨM
+                    DANH MỤC
                 </button>
                 <ul class="flex space-x-6 text-sm font-medium text-gray-800">
                     <li>
-                        <a
-                            class="border-b-2 border-black pb-1 inline-block font-semibold"
-                            href="#"
+                        <router-link
+                            to="/"
+                            :class="[
+                                'pb-1 inline-block',
+                                $route.path === '/'
+                                    ? 'border-b-2 border-black font-semibold'
+                                    : 'hover:underline',
+                            ]"
                         >
                             Trang chủ
-                        </a>
+                        </router-link>
                     </li>
                     <li>
-                        <a class="hover:underline" href="#"> Giới thiệu </a>
+                        <router-link
+                            to="/about"
+                            :class="[
+                                'pb-1 inline-block',
+                                $route.path === '/about'
+                                    ? 'border-b-2 border-black font-semibold'
+                                    : 'hover:underline',
+                            ]"
+                        >
+                            Giới thiệu
+                        </router-link>
                     </li>
                     <li>
-                        <a class="hover:underline" href="#"> Sản phẩm </a>
+                        <router-link
+                            to="/products"
+                            :class="[
+                                'pb-1 inline-block',
+                                $route.path === '/products'
+                                    ? 'border-b-2 border-black font-semibold'
+                                    : 'hover:underline',
+                            ]"
+                        >
+                            Sản phẩm
+                        </router-link>
                     </li>
                     <li>
-                        <a class="hover:underline" href="#"> Tin tức </a>
+                        <router-link
+                            to="/news"
+                            :class="[
+                                'pb-1 inline-block',
+                                $route.path === '/news'
+                                    ? 'border-b-2 border-black font-semibold'
+                                    : 'hover:underline',
+                            ]"
+                        >
+                            Tin tức
+                        </router-link>
                     </li>
                     <li>
-                        <a class="hover:underline" href="#"> Liên hệ </a>
+                        <router-link
+                            to="/contact"
+                            :class="[
+                                'pb-1 inline-block',
+                                $route.path === '/contact'
+                                    ? 'border-b-2 border-black font-semibold'
+                                    : 'hover:underline',
+                            ]"
+                        >
+                            Liên hệ
+                        </router-link>
                     </li>
                 </ul>
             </nav>
         </header>
-        <main class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        <main
+            v-if="$route.path === '/'"
+            class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 mt-6 pt-32"
+        >
             <section
                 class="flex flex-col lg:flex-row gap-6 bg-[#f9f9f9] rounded-md overflow-hidden"
             >
@@ -182,23 +256,24 @@
                         <h2
                             class="text-2xl sm:text-3xl font-extrabold text-gray-900 max-w-md"
                         >
-                            <span> Trang trại </span>
-                            <span class="text-[#6DA544] font-normal">
-                                Thực phẩm
+                            <span> Nấu ăn bằng </span>
+                            <span class="text-[#078a83] font-normal">
+                                tình yêu
                                 <br />
-                                tươi sạch &amp;
+                                thưởng thức
                             </span>
-                            <span> 100% Hữu cơ </span>
+                            <span> bằng niềm vui. </span>
                         </h2>
                         <p class="text-gray-400 text-xs mt-2 max-w-xs">
                             Alway fresh organic products for you
                         </p>
-                        <button
+                        <router-link
+                            to="/products"
                             class="mt-6 bg-[#6DA544] text-white text-xs font-semibold px-5 py-2 rounded-md w-max"
                             type="button"
                         >
                             MUA NGAY
-                        </button>
+                        </router-link>
                     </div>
                 </div>
                 <div
@@ -309,9 +384,41 @@
 import UserMenu from "./UserMenu.vue";
 
 export default {
-    name: "MonaFruit",
-    components: {
-        UserMenu,
+    name: "CheeseCake",
+    data() {
+        return {
+            cartCount: 0,
+        };
+    },
+    mounted() {
+        this.updateCartCount();
+
+        // Nếu có nhiều tab, sẽ bắt được sự kiện thay đổi localStorage
+        window.addEventListener("storage", this.updateCartCount);
+
+        // Optionally: Có thể tạo một custom event để dùng trong cùng tab
+        window.addEventListener("cart-updated", this.updateCartCount);
+    },
+    beforeUnmount() {
+        window.removeEventListener("storage", this.updateCartCount);
+        window.removeEventListener("cart-updated", this.updateCartCount);
+    },
+    methods: {
+        updateCartCount() {
+            const data = localStorage.getItem("cartItems");
+            if (!data) {
+                this.cartCount = 0;
+                return;
+            }
+            try {
+                this.cartCount = JSON.parse(data).reduce(
+                    (sum, item) => sum + item.quantity,
+                    0
+                );
+            } catch {
+                this.cartCount = 0;
+            }
+        },
     },
 };
 </script>
