@@ -8,9 +8,23 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 class AuthController extends Controller
 {
+    private function generateToken($user)
+    {
+        $payload = [
+            'iss' => "laravel-jwt", // Issuer of the token
+            'sub' => $user->id, // Subject of the token
+            'iat' => time(), // Time when JWT was issued
+            'exp' => time() + 60 * 60 * 24 // Expiration time (24 hours)
+        ];
+
+        return JWT::encode($payload, env('JWT_SECRET'), 'HS256');
+    }
+
     public function register(Request $request)
     {
         $validated = $request->validate([
@@ -25,12 +39,12 @@ class AuthController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
-        $token = $user->createToken('auth-token')->plainTextToken;
+        $token = $this->generateToken($user);
 
         return response()->json([
-            'message' => 'User registered successfully',
+            'user' => $user,
             'token' => $token
-        ]);
+        ], 201);
     }
 
     public function login(Request $request)
@@ -47,21 +61,19 @@ class AuthController extends Controller
         }
 
         $user = User::where('email', $request->email)->firstOrFail();
-        $token = $user->createToken('auth-token')->plainTextToken;
+        $token = $this->generateToken($user);
 
         return response()->json([
-            'message' => 'Login successful',
+            'user' => $user,
             'token' => $token
         ]);
     }
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
-
-        return response()->json([
-            'message' => 'Successfully logged out'
-        ]);
+        // Since we're using JWT, we don't need to delete any tokens
+        // The client should remove the token from their storage
+        return response()->json(['message' => 'Logged out successfully']);
     }
 
     public function user(Request $request)

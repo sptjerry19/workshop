@@ -127,27 +127,7 @@
                     </button>
                 </form>
                 <div class="flex items-center space-x-6 text-gray-600 text-lg">
-                    <button
-                        aria-label="User account"
-                        class="hover:text-black transition"
-                        type="button"
-                    >
-                        <i class="far fa-user-circle"> </i>
-                    </button>
-                    <button
-                        aria-label="Shopping bag"
-                        class="hover:text-black transition"
-                        type="button"
-                    >
-                        <i class="far fa-shopping-bag"> </i>
-                    </button>
-                    <button
-                        aria-label="Favorites"
-                        class="hover:text-black transition"
-                        type="button"
-                    >
-                        <i class="far fa-heart"> </i>
-                    </button>
+                    <UserMenu />
                 </div>
             </div>
             <nav class="flex items-center space-x-4 border-b border-gray-200">
@@ -326,7 +306,12 @@
 </template>
 
 <script>
+import UserMenu from "./UserMenu.vue";
+
 export default {
     name: "MonaFruit",
+    components: {
+        UserMenu,
+    },
 };
 </script>

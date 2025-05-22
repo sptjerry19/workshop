@@ -1,53 +1,59 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import Login from '../views/auth/Login.vue'
-import Register from '../views/auth/Register.vue'
-import Dashboard from '../views/Dashboard.vue'
-import Home from '../views/Home.vue'
+import { createRouter, createWebHistory } from "vue-router";
+import Login from "../views/auth/Login.vue";
+import Register from "../views/auth/Register.vue";
+import Dashboard from "../views/Dashboard.vue";
+import Home from "../views/Home.vue";
 
 const routes = [
     {
-        path: '/',
-        name: 'home',
+        path: "/",
+        name: "home",
         component: Home,
-        meta: { requiresAuth: false }
+        meta: { requiresAuth: false },
     },
     {
-        path: '/login',
-        name: 'login',
+        path: "/login",
+        name: "login",
         component: Login,
-        meta: { requiresAuth: false }
+        meta: { requiresAuth: false },
     },
     {
-        path: '/register',
-        name: 'register',
+        path: "/register",
+        name: "register",
         component: Register,
-        meta: { requiresAuth: false }
+        meta: { requiresAuth: false },
     },
     {
-        path: '/dashboard',
-        name: 'dashboard',
+        path: "/dashboard",
+        name: "dashboard",
         component: Dashboard,
-        meta: { requiresAuth: true }
-    }
-]
+        meta: { requiresAuth: true },
+    },
+];
 
 const router = createRouter({
     history: createWebHistory(),
-    routes
-})
+    routes,
+});
 
 // Navigation guard
 router.beforeEach((to, from, next) => {
-    const token = document.cookie.split('; ').find(row => row.startsWith('token='))
-    const isAuthenticated = !!token
+    const token = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("token="));
+    const isAuthenticated = !!token;
 
     if (to.meta.requiresAuth && !isAuthenticated) {
-        next('/login')
-    } else if (!to.meta.requiresAuth && isAuthenticated) {
-        next('/dashboard')
+        next("/login");
+    } else if (
+        !to.meta.requiresAuth &&
+        isAuthenticated &&
+        (to.name === "login" || to.name === "register")
+    ) {
+        next("/");
     } else {
-        next()
+        next();
     }
-})
+});
 
-export default router 
+export default router;
