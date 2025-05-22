@@ -11,7 +11,7 @@
                         <h1
                             class="text-2xl font-extrabold text-black flex items-center gap-1"
                         >
-                            <span> Cheese Cake </span>
+                            <span> CheeseCake </span>
                             <svg
                                 width="64px"
                                 height="64px"

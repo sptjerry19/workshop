@@ -6,7 +6,10 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\OrderController;
 use App\Models\Product;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\NewsController;
 
 Route::get('/', function () {
     return 'OK';
@@ -18,8 +21,6 @@ Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{product}', [ProductController::class, 'show']);
 Route::get('/categories', [CategoryController::class, 'index']);
 
-//test
-Route::post('/products', [ProductController::class, 'store']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -27,7 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
 
     // Payment routes
-    Route::post('/payment/create', [PaymentController::class, 'createPayment']);
+    // Route::post('/payment/create', [PaymentController::class, 'createPayment']);
 
     // Product routes
     // Route::post('/products', [ProductController::class, 'store']);
@@ -35,9 +36,62 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/products/{product}', [ProductController::class, 'destroy']);
 });
 
+// Payment routes
+Route::post('/payment/create', [PaymentController::class, 'createPayment']);
+Route::get('/payment/{paymentId}/qr', [PaymentController::class, 'getQRCode']);
+Route::get('/payment/{paymentId}/status', [PaymentController::class, 'getPaymentStatus']);
+
 // Payment webhook routes
 Route::post('/payment/ipn', [PaymentController::class, 'handleIPN'])->name('payment.ipn');
 Route::get('/payment/redirect', [PaymentController::class, 'handleRedirect'])->name('payment.redirect');
 
 Route::apiResource('categories', CategoryController::class);
 Route::apiResource('products', ProductController::class);
+
+// Order Routes
+Route::prefix('orders')->group(function () {
+    Route::get('/', [OrderController::class, 'index']);
+    Route::post('/', [OrderController::class, 'store']);
+    Route::get('/{id}', [OrderController::class, 'show']);
+    Route::patch('/{id}/status', [OrderController::class, 'updateStatus']);
+});
+
+// Admin routes
+// middleware(['auth:sanctum', 'admin'])->
+Route::prefix('admin')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [AdminController::class, 'dashboard']);
+
+    // Orders
+    Route::get('/orders', [AdminController::class, 'orders']);
+    Route::get('/orders/{order}', [AdminController::class, 'showOrder']);
+    Route::put('/orders/{order}', [AdminController::class, 'updateOrder']);
+
+    // Products
+    Route::get('/products', [ProductController::class, 'index']);
+    Route::post('/products', [ProductController::class, 'store']);
+    Route::get('/products/{id}', [ProductController::class, 'show']);
+    Route::put('/products/{id}', [ProductController::class, 'update']);
+    Route::delete('/products/{product}', [ProductController::class, 'destroy']);
+
+    // Categories
+    Route::get('/categories', [CategoryController::class, 'index']);
+    Route::post('/categories', [CategoryController::class, 'store']);
+    Route::get('/categories/{category}', [CategoryController::class, 'show']);
+    Route::put('/categories/{category}', [CategoryController::class, 'update']);
+    Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);
+
+    // News
+    Route::get('/news', [AdminController::class, 'news']);
+    Route::post('/news', [AdminController::class, 'createNews']);
+    Route::get('/news/{news}', [AdminController::class, 'showNews']);
+    Route::put('/news/{news}', [AdminController::class, 'updateNews']);
+    Route::delete('/news/{news}', [AdminController::class, 'deleteNews']);
+
+    // Users
+    Route::get('/users', [AdminController::class, 'users']);
+    Route::post('/users', [AdminController::class, 'createUser']);
+    Route::get('/users/{user}', [AdminController::class, 'showUser']);
+    Route::put('/users/{user}', [AdminController::class, 'updateUser']);
+    Route::delete('/users/{user}', [AdminController::class, 'deleteUser']);
+});

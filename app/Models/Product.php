@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\Common;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -35,12 +36,17 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
     public function transform()
     {
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'image' => $this->image,
+            'image' => Common::responseImage($this->image),
             'price' => $this->price,
             'size' => $this->size,
             'sold' => $this->sold,

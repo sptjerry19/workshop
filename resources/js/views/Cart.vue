@@ -77,6 +77,195 @@
                     {{ formatPrice(totalPrice) }}
                 </div>
             </div>
+            <div class="mt-8 flex justify-end">
+                <button
+                    @click="showCustomerInfoModal = true"
+                    class="bg-[#d80000] text-white px-8 py-3 rounded-lg hover:bg-[#b80000] transition-colors"
+                >
+                    Thanh toán
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Info Modal -->
+    <div
+        v-if="showCustomerInfoModal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    >
+        <div class="bg-white rounded-lg p-6 w-full max-w-md">
+            <h2 class="text-xl font-bold mb-4">Thông tin giao hàng</h2>
+            <form @submit.prevent="handleCustomerInfoSubmit">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700"
+                            >Họ và tên</label
+                        >
+                        <input
+                            v-model="customerInfo.name"
+                            type="text"
+                            required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#d80000] focus:ring-[#d80000]"
+                        />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700"
+                            >Số điện thoại</label
+                        >
+                        <input
+                            v-model="customerInfo.phone"
+                            type="tel"
+                            required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#d80000] focus:ring-[#d80000]"
+                        />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700"
+                            >Địa chỉ</label
+                        >
+                        <textarea
+                            v-model="customerInfo.address"
+                            required
+                            rows="3"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#d80000] focus:ring-[#d80000]"
+                        ></textarea>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button
+                        type="button"
+                        @click="showCustomerInfoModal = false"
+                        class="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50"
+                    >
+                        Hủy
+                    </button>
+                    <button
+                        type="submit"
+                        class="px-4 py-2 bg-[#d80000] text-white rounded-md hover:bg-[#b80000]"
+                    >
+                        Tiếp tục
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Payment Options Modal -->
+    <div
+        v-if="showPaymentOptions"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    >
+        <div class="bg-white rounded-lg p-6 w-full max-w-md">
+            <h2 class="text-xl font-bold mb-4">Chọn phương thức thanh toán</h2>
+            <div class="space-y-4">
+                <button
+                    @click="handlePaymentMethod('cod')"
+                    class="w-full p-4 border rounded-lg hover:bg-gray-50 text-left"
+                >
+                    <div class="font-medium">
+                        Thanh toán khi nhận hàng (COD)
+                    </div>
+                    <div class="text-sm text-gray-500">
+                        Thanh toán bằng tiền mặt khi nhận hàng
+                    </div>
+                </button>
+                <button
+                    @click="handlePaymentMethod('momo')"
+                    class="w-full p-4 border rounded-lg hover:bg-gray-50 text-left"
+                >
+                    <div class="font-medium">Thanh toán qua Momo</div>
+                    <div class="text-sm text-gray-500">
+                        Thanh toán nhanh chóng và an toàn qua ví Momo
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Result Modal -->
+    <div
+        v-if="showOrderResult"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    >
+        <div class="bg-white rounded-lg p-6 w-full max-w-md">
+            <div class="text-center">
+                <div v-if="orderSuccess" class="mb-4">
+                    <svg
+                        class="mx-auto h-16 w-16 text-green-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M5 13l4 4L19 7"
+                        ></path>
+                    </svg>
+                    <h2 class="text-xl font-bold text-green-600 mt-4">
+                        Đặt hàng thành công!
+                    </h2>
+                    <p class="text-gray-600 mt-2">
+                        Cảm ơn bạn đã đặt hàng. Chúng tôi sẽ liên hệ với bạn sớm
+                        nhất.
+                    </p>
+                </div>
+                <div v-else class="mb-4">
+                    <svg
+                        class="mx-auto h-16 w-16 text-red-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12"
+                        ></path>
+                    </svg>
+                    <h2 class="text-xl font-bold text-red-600 mt-4">
+                        Đặt hàng không thành công!
+                    </h2>
+                    <p class="text-gray-600 mt-2">{{ orderErrorMessage }}</p>
+                </div>
+            </div>
+            <div class="mt-6 flex justify-center">
+                <button
+                    @click="closeOrderResult"
+                    class="px-6 py-2 bg-[#d80000] text-white rounded-md hover:bg-[#b80000]"
+                >
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Momo QR Modal -->
+    <div
+        v-if="showMomoQR"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    >
+        <div class="bg-white rounded-lg p-6 w-full max-w-md">
+            <h2 class="text-xl font-bold mb-4">Quét mã QR để thanh toán</h2>
+            <div class="text-center">
+                <img :src="momoQRUrl" alt="Momo QR Code" class="mx-auto mb-4" />
+                <p class="text-sm text-gray-500 mb-4">
+                    Vui lòng quét mã QR bằng ứng dụng Momo để thanh toán
+                </p>
+                <p class="text-lg font-bold text-[#d80000]">
+                    {{ formatPrice(totalPrice) }}
+                </p>
+            </div>
+            <div class="mt-6 flex justify-end">
+                <button
+                    @click="showMomoQR = false"
+                    class="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50"
+                >
+                    Đóng
+                </button>
+            </div>
         </div>
     </div>
 </template>
@@ -84,13 +273,28 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import Banner from "../components/Banner.vue";
+import axios from "axios";
 
 const cartItems = ref([]);
+const showCustomerInfoModal = ref(false);
+const showPaymentOptions = ref(false);
+const showMomoQR = ref(false);
+const momoQRUrl = ref("");
+const paymentId = ref("");
+const customerInfo = ref({
+    name: "",
+    phone: "",
+    address: "",
+});
+const showOrderResult = ref(false);
+const orderSuccess = ref(false);
+const orderErrorMessage = ref("");
 
 function loadCart() {
     const data = localStorage.getItem("cartItems");
     cartItems.value = data ? JSON.parse(data) : [];
 }
+
 function saveCart() {
     localStorage.setItem("cartItems", JSON.stringify(cartItems.value));
     window.dispatchEvent(new Event("cart-updated"));
@@ -145,6 +349,125 @@ const totalPrice = computed(() => {
         return sum + price * item.quantity;
     }, 0);
 });
+
+async function handleCustomerInfoSubmit() {
+    showCustomerInfoModal.value = false;
+    showPaymentOptions.value = true;
+}
+
+async function handlePaymentMethod(method) {
+    try {
+        const orderData = {
+            items: cartItems.value,
+            customer: customerInfo.value,
+            total: totalPrice.value,
+            payment_method: method,
+        };
+
+        const response = await axios.post("/api/orders", orderData);
+
+        if (response.data.success) {
+            // Clear cart
+            cartItems.value = [];
+            saveCart();
+
+            // Show success modal
+            orderSuccess.value = true;
+            showOrderResult.value = true;
+            showPaymentOptions.value = false;
+
+            // If payment method is momo, proceed with payment
+            if (method === "momo") {
+                await createMomoPayment();
+            }
+        }
+    } catch (error) {
+        console.error("Error creating order:", error);
+        orderSuccess.value = false;
+        orderErrorMessage.value =
+            error.response?.data?.message ||
+            "Có lỗi xảy ra khi đặt hàng. Vui lòng thử lại.";
+        showOrderResult.value = true;
+        showPaymentOptions.value = false;
+    }
+}
+
+async function createMomoPayment() {
+    try {
+        const paymentData = {
+            amount: totalPrice.value,
+            currency: "VND",
+            description: `Thanh toan don hang - ${customerInfo.value.name} - ${customerInfo.value.phone} - ${customerInfo.value.address}`,
+        };
+
+        const response = await axios.post("/api/payment/create", paymentData);
+
+        if (response.data.success) {
+            paymentId.value = response.data.payment.id;
+
+            if (response.data.payment.payUrl) {
+                // Redirect to Momo payment page
+                window.location.href = response.data.payment.payUrl;
+            } else {
+                // Get QR code URL from payment response
+                const qrResponse = await axios.get(
+                    `/api/payment/${paymentId.value}/qr`
+                );
+                if (qrResponse.data.success) {
+                    momoQRUrl.value = qrResponse.data.qrCodeUrl;
+                    showMomoQR.value = true;
+                    // Start polling payment status
+                    pollPaymentStatus();
+                }
+            }
+        } else {
+            alert(response.data.message || "Có lỗi xảy ra khi tạo thanh toán");
+        }
+    } catch (error) {
+        console.error("Error creating Momo payment:", error);
+        alert(
+            error.response?.data?.message ||
+                "Có lỗi xảy ra khi tạo thanh toán. Vui lòng thử lại."
+        );
+    }
+}
+
+async function pollPaymentStatus() {
+    const checkStatus = async () => {
+        try {
+            const response = await axios.get(
+                `/api/payment/${paymentId.value}/status`
+            );
+
+            if (response.data.status === "completed") {
+                // Payment successful
+                showMomoQR.value = false;
+                cartItems.value = [];
+                saveCart();
+                alert("Thanh toán thành công!");
+            } else if (response.data.status === "failed") {
+                showMomoQR.value = false;
+                alert("Thanh toán thất bại. Vui lòng thử lại.");
+            } else {
+                // Continue polling
+                setTimeout(checkStatus, 3000);
+            }
+        } catch (error) {
+            console.error("Error checking payment status:", error);
+            setTimeout(checkStatus, 3000);
+        }
+    };
+
+    checkStatus();
+}
+
+function closeOrderResult() {
+    showOrderResult.value = false;
+    if (orderSuccess.value) {
+        // Redirect to home page or order history
+        window.location.href = "/";
+    }
+}
 </script>
 
 <style scoped></style>
