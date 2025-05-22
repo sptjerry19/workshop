@@ -129,32 +129,44 @@
                     </button>
                 </form>
                 <div class="flex items-center space-x-6 text-gray-600 text-lg">
-                    <button
-                        aria-label="User account"
-                        class="hover:text-black transition"
-                        type="button"
-                    >
-                        <i class="far fa-user-circle"> </i>
-                    </button>
+                    <UserMenu />
                     <router-link
                         to="/cart"
                         class="relative hover:text-black transition"
                         aria-label="Shopping bag"
                     >
-                        <i class="far fa-shopping-bag"></i>
+                        <svg
+                            width="24px"
+                            height="24px"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                            stroke="#000000"
+                        >
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g
+                                id="SVGRepo_tracerCarrier"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke="#CCCCCC"
+                                stroke-width="0.672"
+                            ></g>
+                            <g id="SVGRepo_iconCarrier">
+                                <path
+                                    d="M6.29977 5H21L19 12H7.37671M20 16H8L6 3H3M9 20C9 20.5523 8.55228 21 8 21C7.44772 21 7 20.5523 7 20C7 19.4477 7.44772 19 8 19C8.55228 19 9 19.4477 9 20ZM20 20C20 20.5523 19.5523 21 19 21C18.4477 21 18 20.5523 18 20C18 19.4477 18.4477 19 19 19C19.5523 19 20 19.4477 20 20Z"
+                                    stroke="#000000"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                ></path>
+                            </g>
+                        </svg>
                         <span
                             v-if="cartCount > 0"
                             class="absolute -top-2 -right-2 bg-[#d80000] text-white text-xs rounded-full px-1.5"
                             >{{ cartCount }}</span
                         >
                     </router-link>
-                    <button
-                        aria-label="Favorites"
-                        class="hover:text-black transition"
-                        type="button"
-                    >
-                        <i class="far fa-heart"> </i>
-                    </button>
                 </div>
             </div>
             <nav class="flex items-center space-x-4 border-b border-gray-200">
@@ -385,6 +397,9 @@ import UserMenu from "./UserMenu.vue";
 
 export default {
     name: "CheeseCake",
+    components: {
+        UserMenu, // 👈 ĐĂNG KÝ Ở ĐÂY
+    },
     data() {
         return {
             cartCount: 0,

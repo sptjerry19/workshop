@@ -8,6 +8,7 @@
             >
                 Đăng nhập
             </router-link>
+            <div class="text-gray-600 hover:text-black transition">/</div>
             <router-link
                 to="/register"
                 class="text-gray-600 hover:text-black transition"

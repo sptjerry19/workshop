@@ -323,10 +323,16 @@ const showPaymentOptions = ref(false);
 const showMomoQR = ref(false);
 const momoQRUrl = ref("");
 const paymentId = ref("");
+// Cookie getter
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+}
 const customerInfo = ref({
     name: "",
-    phone: "",
-    address: "",
+    phone: "087654321",
+    address: "tòa xyz Thành phố Hà Nội",
 });
 const showOrderResult = ref(false);
 const orderSuccess = ref(false);
@@ -346,6 +352,17 @@ function saveCart() {
 
 onMounted(() => {
     loadCart();
+
+    const userCookie = getCookie("user");
+    if (userCookie) {
+        try {
+            const decoded = decodeURIComponent(userCookie); // Step 2
+            const user = JSON.parse(decoded); // Step 3
+            customerInfo.value.name = user.name; // Step 4
+        } catch (e) {
+            console.error("Lỗi xử lý cookie user:", e);
+        }
+    }
 });
 
 function formatPrice(price) {

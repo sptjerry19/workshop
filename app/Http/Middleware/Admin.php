@@ -9,7 +9,7 @@ class Admin
 {
     public function handle(Request $request, Closure $next)
     {
-        if (!auth()->check() || auth()->user()->role !== 'admin') {
+        if (!auth()->check() || auth()->user()->is_admin) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized'

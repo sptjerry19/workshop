@@ -59,7 +59,7 @@ Route::prefix('orders')->group(function () {
 
 // Admin routes
 // middleware(['auth:sanctum', 'admin'])->
-Route::prefix('admin')->group(function () {
+Route::middleware(['jwt.auth'])->prefix('admin')->group(function () {
     // Dashboard
     Route::get('/dashboard', [AdminController::class, 'dashboard']);
 
