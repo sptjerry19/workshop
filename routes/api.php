@@ -9,6 +9,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
 use App\Models\Product;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\MomoPaymentController;
 use App\Http\Controllers\NewsController;
 
 Route::get('/', function () {
@@ -40,6 +41,15 @@ Route::middleware('jwt.auth')->group(function () {
 Route::post('/payment/create', [PaymentController::class, 'createPayment']);
 Route::get('/payment/{paymentId}/qr', [PaymentController::class, 'getQRCode']);
 Route::get('/payment/{paymentId}/status', [PaymentController::class, 'getPaymentStatus']);
+// payment momo
+// Momo Payment Routes
+Route::prefix('payment/momo')->group(function () {
+    Route::post('/create', [MomoPaymentController::class, 'createPayment'])->name('momo.payment.create');
+    Route::get('/{paymentId}/qr', [MomoPaymentController::class, 'getQRCode'])->name('momo.payment.qr');
+    Route::get('/{paymentId}/status', [MomoPaymentController::class, 'checkStatus'])->name('momo.payment.status');
+    Route::get('/return', [MomoPaymentController::class, 'return'])->name('momo.payment.return');
+    Route::post('/ipn', [MomoPaymentController::class, 'ipn'])->name('momo.payment.ipn');
+});
 
 // Payment webhook routes
 Route::post('/payment/ipn', [PaymentController::class, 'handleIPN'])->name('payment.ipn');
