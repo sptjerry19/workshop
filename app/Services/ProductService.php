@@ -44,6 +44,27 @@ class ProductService extends BaseService
         }
     }
 
+    public function getAllProducts(array $params)
+    {
+        $keyword = $params['q'] ?? null;
+        $categoryId = $params['category_id'] ?? null;
+        $sortBy = $params['sort_by'] ?? 'created_at';
+        $sortOrder = $params['sort_order'] ?? 'desc';
+
+        try {
+            $products = Product::with('category')
+                ->when($keyword, fn($query) => $query->where('name', 'like', "%$keyword%"))
+                ->when($categoryId, fn($query) => $query->where('category_id', $categoryId))
+                ->orderBy($sortBy, $sortOrder)
+                ->get();
+
+            return $this->transformPaginationResult($products, fn($item) => $item->transform());
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return false;
+        }
+    }
+
     public function getProductById($id)
     {
         try {
