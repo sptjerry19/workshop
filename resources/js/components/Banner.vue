@@ -116,12 +116,12 @@
                 >
                     <input
                         aria-label="Search"
-                        class="flex-grow border border-gray-300 rounded-l-md px-4 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-green-600"
+                        class="flex-grow border border-gray-300 rounded-l-md px-4 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:border-yellow-600"
                         placeholder="Đang tìm kiếm....."
                         type="search"
                     />
                     <button
-                        class="bg-[#6DA544] text-white px-5 py-2 rounded-r-md text-xs font-semibold tracking-wider flex items-center gap-2 hover:bg-[#5a8a33] transition"
+                        class="bg-[#eeb600] text-white px-5 py-2 rounded-r-md text-xs font-semibold tracking-wider flex items-center gap-2 hover:bg-[#dacb77] transition"
                         type="submit"
                     >
                         TÌM KIẾM
@@ -171,7 +171,7 @@
             </div>
             <nav class="flex items-center space-x-4 border-b border-gray-200">
                 <button
-                    class="flex items-center gap-2 bg-[#6DA544] text-white text-xs font-semibold px-5 py-3 rounded-md"
+                    class="flex items-center gap-2 bg-[#eeb600] text-white text-xs font-semibold px-5 py-3 rounded-md"
                     type="button"
                 >
                     DANH MỤC
@@ -259,7 +259,7 @@
                         alt="Fresh vegetables in a paper bag including a yellow pepper, carrot, cauliflower, and tomatoes on a white background"
                         class="w-full h-80 object-cover"
                         height="400"
-                        src="https://storage.googleapis.com/a1aa/image/75840fb7-a6fc-44b6-a0d6-6b6cd05fcb73.jpg"
+                        :src="baseImageUrl + 'text_effect_cheese.jpg'"
                         width="720"
                     />
                     <div
@@ -281,7 +281,7 @@
                         </p>
                         <router-link
                             to="/products"
-                            class="mt-6 bg-[#6DA544] text-white text-xs font-semibold px-5 py-2 rounded-md w-max"
+                            class="mt-6 bg-[#eeb600] text-white text-xs font-semibold px-5 py-2 rounded-md w-max"
                             type="button"
                         >
                             MUA NGAY
@@ -403,6 +403,7 @@ export default {
     data() {
         return {
             cartCount: 0,
+            baseImageUrl: import.meta.env.VITE_RESPONE_IMAGE_URL,
         };
     },
     mounted() {
