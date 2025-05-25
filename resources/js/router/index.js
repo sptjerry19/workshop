@@ -13,6 +13,7 @@ import NewsAdmin from "../views/admin/News.vue";
 import OrdersAdmin from "../views/admin/Orders.vue";
 import UsersAdmin from "../views/admin/Users.vue";
 import CategoriesAdmin from "../views/admin/Categories.vue";
+import GoogleCallback from "../views/auth/GoogleCallback.vue";
 
 const routes = [
     {
@@ -96,6 +97,11 @@ const routes = [
         path: "/dashboard/categories",
         name: "categoriesadmin",
         component: CategoriesAdmin,
+    },
+    {
+        path: "/auth/google/callback",
+        name: "GoogleCallback",
+        component: GoogleCallback,
     },
 ];
 

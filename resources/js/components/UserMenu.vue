@@ -80,42 +80,36 @@ export default {
             )}; path=/; max-age=86400`; // 24 hours
         };
 
-        const getUserCookie = () => {
-            const userCookie = document.cookie
-                .split("; ")
-                .find((row) => row.startsWith("user="));
-            if (userCookie) {
-                try {
-                    return JSON.parse(
-                        decodeURIComponent(userCookie.split("=")[1])
-                    );
-                } catch (e) {
-                    return null;
-                }
-            }
-            return null;
-        };
-
         const checkAuth = () => {
+            console.log("Checking auth...");
             const token = document.cookie
                 .split("; ")
                 .find((row) => row.startsWith("token="));
+            console.log("Token from cookie:", token);
             isAuthenticated.value = !!token;
 
             if (isAuthenticated.value) {
                 // First try to get user from cookie
                 const userData = getUserCookie();
+                console.log("User data from cookie:", userData);
                 if (userData) {
                     user.value = userData;
                 } else {
                     // If not in cookie, fetch from API
+                    const tokenValue = token.split("=")[1];
                     axios
-                        .get("/api/user")
+                        .get("/api/user", {
+                            headers: {
+                                Authorization: `Bearer ${tokenValue}`,
+                            },
+                        })
                         .then((response) => {
+                            console.log("User data from API:", response.data);
                             user.value = response.data;
                             setUserCookie(response.data);
                         })
-                        .catch(() => {
+                        .catch((error) => {
+                            console.error("Error fetching user:", error);
                             // If token is invalid, clear everything
                             document.cookie =
                                 "token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
@@ -126,6 +120,28 @@ export default {
                         });
                 }
             }
+            console.log("isAuthenticated:", isAuthenticated.value);
+            console.log("user:", user.value);
+        };
+
+        const getUserCookie = () => {
+            const userCookie = document.cookie
+                .split("; ")
+                .find((row) => row.startsWith("user="));
+            console.log("Raw user cookie:", userCookie);
+            if (userCookie) {
+                try {
+                    const decodedUser = JSON.parse(
+                        decodeURIComponent(userCookie.split("=")[1])
+                    );
+                    console.log("Decoded user:", decodedUser);
+                    return decodedUser;
+                } catch (e) {
+                    console.error("Error parsing user cookie:", e);
+                    return null;
+                }
+            }
+            return null;
         };
 
         const toggleMenu = () => {
