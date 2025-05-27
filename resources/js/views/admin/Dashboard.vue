@@ -176,6 +176,7 @@
                     </div>
                 </div>
             </div>
+            <AdminChatBox />
         </div>
     </AdminLayout>
 </template>
@@ -183,6 +184,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import AdminLayout from "@/layouts/AdminLayout.vue";
+import AdminChatBox from "../../components/AdminChatBox.vue";
 import axios from "axios";
 
 const stats = ref({

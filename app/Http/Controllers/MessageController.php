@@ -8,6 +8,8 @@ use App\Events\NewMessage;
 use App\Helpers\APIResponse;
 use Exception;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use PhpParser\Node\Expr\Cast\String_;
 
 class MessageController extends Controller
 {
@@ -25,6 +27,28 @@ class MessageController extends Controller
             Log::error($e->getMessage());
             return APIResponse::error(__("get message failed"), 500);
         }
+    }
+
+    public function getUsers(Request $request)
+    {
+        $users = Message::select('from_sender_id', 'content', 'created_at')
+            ->whereIn('id', function ($query) {
+                $query->select(DB::raw('MAX(id)'))
+                    ->from('messages')
+                    ->where('from_sender_id', '!=', 'admin')
+                    ->groupBy('from_sender_id');
+            })
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($message) {
+                return [
+                    'from_sender_id' => $message->from_sender_id,
+                    'last_message' => $message->content,
+                    'last_message_time' => $message->created_at
+                ];
+            });
+
+        return response()->json($users);
     }
 
     public function store(Request $request)
@@ -50,18 +74,17 @@ class MessageController extends Controller
         }
     }
 
-    public function adminReply(Request $request, Message $message)
+    public function adminReply(Request $request, string $senderId)
     {
         try {
             $request->validate([
                 'content' => 'required|string|max:1000',
-                'sender_id' => 'required|string'
             ]);
 
             $reply = Message::create([
                 'content' => $request->content,
                 'from_sender_id' => 'admin',
-                'to_sender_id' => $request->sender_id
+                'to_sender_id' => $senderId
             ]);
 
             broadcast(new NewMessage($reply))->toOthers();

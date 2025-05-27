@@ -111,5 +111,6 @@ Route::middleware('web')->group(function () {
 
 // Chat routes
 Route::get('/messages', [MessageController::class, 'index']);
+Route::get('/messages/users', [MessageController::class, 'getUsers']);
 Route::post('/messages', [MessageController::class, 'store']);
-Route::post('/messages/{message}/reply', [MessageController::class, 'adminReply'])->middleware('jwt.auth');
+Route::post('/messages/{from_sender_id}/reply', [MessageController::class, 'adminReply'])->middleware('jwt.auth');
