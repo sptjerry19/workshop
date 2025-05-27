@@ -11,6 +11,7 @@
             @update:products="products = $event"
         />
         <PromotionSection :products="productsPromote" />
+        <ChatBox />
         <Footer />
     </div>
 </template>
@@ -24,6 +25,7 @@ import CategoryList from "../components/CategoryList.vue";
 import ProductSection from "../components/ProductSection.vue";
 import PromotionSection from "../components/PromotionSection.vue";
 import Footer from "../components/Footer.vue";
+import ChatBox from "../components/ChatBox.vue";
 
 import api from "../api.js";
 

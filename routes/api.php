@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\MessageController;
 
 Route::get('/', function () {
     return 'OK';
@@ -107,3 +108,8 @@ Route::middleware('web')->group(function () {
     Route::get('auth/google', [GoogleController::class, 'redirectToGoogle']);
     Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 });
+
+// Chat routes
+Route::get('/messages', [MessageController::class, 'index']);
+Route::post('/messages', [MessageController::class, 'store']);
+Route::post('/messages/{message}/reply', [MessageController::class, 'adminReply'])->middleware('jwt.auth');
