@@ -64,6 +64,7 @@ Route::apiResource('products', ProductController::class);
 // Order Routes
 Route::prefix('orders')->group(function () {
     Route::get('/', [OrderController::class, 'index']);
+    Route::get('/histories', [OrderController::class, 'getHistories']);
     Route::post('/', [OrderController::class, 'store']);
     // Route::get('/{id}', [OrderController::class, 'show']);
     // Route::get('/generateQr', [OrderController::class, 'generateQr']);

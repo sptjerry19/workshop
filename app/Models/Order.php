@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 class Order extends Model
 {
     protected $fillable = [
+        'user_id',
         'order_number',
         'customer_name',
         'customer_phone',
@@ -34,6 +35,7 @@ class Order extends Model
     {
         return [
             'id' => $this->id,
+            'user_id' => $this->user_id,
             'order_number' => $this->order_number,
             'customer_name' => $this->customer_name,
             'customer_phone' => $this->customer_phone,

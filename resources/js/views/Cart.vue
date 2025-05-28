@@ -88,6 +88,9 @@
         </div>
     </div>
 
+    <!-- Add OrderHistory component -->
+    <OrderHistory />
+
     <!-- Customer Info Modal -->
     <div
         v-if="showCustomerInfoModal"
@@ -315,6 +318,7 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import Banner from "../components/Banner.vue";
+import OrderHistory from "../components/OrderHistory.vue";
 import axios from "axios";
 
 const cartItems = ref([]);
@@ -428,6 +432,9 @@ async function handlePaymentMethod(method) {
             customer: customerInfo.value,
             total: totalPrice.value,
             payment_method: method,
+            user_id: getCookie("user")
+                ? JSON.parse(decodeURIComponent(getCookie("user"))).id
+                : localStorage.getItem("chat_user_id"),
         };
 
         const response = await axios.post("/api/orders", orderData);
@@ -483,6 +490,9 @@ async function confirmBankPayment() {
             customer: customerInfo.value,
             total: totalPrice.value,
             payment_method: "bank",
+            user_id: getCookie("user")
+                ? JSON.parse(decodeURIComponent(getCookie("user"))).id
+                : localStorage.getItem("chat_user_id"),
         };
 
         const response = await axios.post("/api/orders", orderData);
@@ -568,6 +578,9 @@ async function pollPaymentStatus() {
                     total: totalPrice.value,
                     payment_method: "momo",
                     payment_id: paymentId.value,
+                    user_id: getCookie("user")
+                        ? JSON.parse(decodeURIComponent(getCookie("user"))).id
+                        : null,
                 };
 
                 const orderResponse = await axios.post(

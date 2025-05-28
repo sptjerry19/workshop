@@ -28,6 +28,7 @@ class StoreRequest extends FormRequest
             'customer.phone' => 'required|string|max:20',
             'customer.address' => 'required|string',
             'total' => 'required|numeric|min:0',
+            'user_id' => 'string|nullable',
             'payment_method' => 'required|string|in:cod,momo,bank'
         ];
     }

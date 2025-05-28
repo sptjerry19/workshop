@@ -33,6 +33,27 @@ class OrderService extends BaseService
         }
     }
 
+    public function getHistories(array $params)
+    {
+        $keyword = $params['q'] ?? null;
+        $status = $params['status'] ?? null;
+        $paymentStatus = $params['payment_status'] ?? null;
+        $perPage = $params['per_page'] ?? 10;
+        $userId = $params['user_id'] ?? null;
+        try {
+            $histories = Order::with('orderItems.product')
+                ->where('user_id', $userId)
+                ->orderBy('created_at', 'desc')
+                ->when($keyword, fn($query) => $query->where('id', 'like', "%$keyword%"))
+                ->when($status, fn($query) => $query->where('order_status', $status))
+                ->when($paymentStatus, fn($query) => $query->where('payment_status', $paymentStatus))
+                ->paginate($perPage);
+            return $this->transformPaginationResult($histories, fn($item) => $item->transform());
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
     public function createOrder(array $params)
     {
         try {
@@ -44,7 +65,8 @@ class OrderService extends BaseService
                 'payment_method' => $params['payment_method'],
                 'items' => $params['items'],
                 'payment_status' => $params['payment_method'] === 'cod' ? 'pending' : 'pending',
-                'order_status' => 'pending'
+                'order_status' => 'pending',
+                'user_id' => $params['user_id'] ?? null
             ];
             $order = Order::create($data);
             return $order;
