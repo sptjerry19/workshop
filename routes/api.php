@@ -10,6 +10,7 @@ use App\Http\Controllers\OrderController;
 use App\Models\Product;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\MomoPaymentController;
+use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\NewsController;
 
 Route::get('/', function () {
@@ -19,6 +20,7 @@ Route::get('/', function () {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/products', [ProductController::class, 'index']);
+Route::get('/products/all', [ProductController::class, 'indexAll']);
 Route::get('/products/{product}', [ProductController::class, 'show']);
 Route::get('/categories', [CategoryController::class, 'index']);
 
@@ -108,4 +110,10 @@ Route::middleware(['jwt.auth'])->prefix('admin')->group(function () {
     Route::get('/users/{user}', [AdminController::class, 'showUser']);
     Route::put('/users/{user}', [AdminController::class, 'updateUser']);
     Route::delete('/users/{user}', [AdminController::class, 'deleteUser']);
+});
+
+// Google OAuth Routes
+Route::middleware('web')->group(function () {
+    Route::get('auth/google', [GoogleController::class, 'redirectToGoogle']);
+    Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 });

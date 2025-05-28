@@ -5,9 +5,12 @@
         <!-- <CategoryList /> -->
         <!-- <ProductSection title="Sản phẩm chất lượng" :products="products" />
         <ProductSection title="Bán chạy" :products="products" /> -->
-        <ProductSection title="Best seller" :products="products" />
-        <ProductSection title="Must try" :products="products" />
-        <PromotionSection :products="products" />
+        <ProductSection
+            title="Best Seller"
+            :products="products"
+            @update:products="products = $event"
+        />
+        <PromotionSection :products="productsPromote" />
         <Footer />
     </div>
 </template>
@@ -29,7 +32,7 @@ const productsPromote = ref([]);
 
 onMounted(async () => {
     try {
-        const response = await api.get("/products?take=20");
+        const response = await api.get("/products?take=40");
         console.log("API Response:", response.data);
         products.value = response.data.data;
         console.log("Products after assignment:", products.value);
@@ -38,7 +41,7 @@ onMounted(async () => {
     }
 
     try {
-        const response = await api.get("/products?take=20&sort_by=discount");
+        const response = await api.get("/products?take=10&sort_by=discount");
         console.log("API Response:", response.data);
         productsPromote.value = response.data.data;
         console.log("Products after assignment:", productsPromote.value);

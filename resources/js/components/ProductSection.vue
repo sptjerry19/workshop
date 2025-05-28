@@ -12,17 +12,35 @@
             class="flex absolute top-3 right-8 justify-end gap-8 mt-6 text-sm text-gray-400 font-semibold max-w-[1200px] mx-auto"
         >
             <div
-                class="cursor-pointer hover:font-semibold hover:underline hover:underline-offset-4 hover:decoration-2 hover:decoration-black transition-all duration-200"
+                @click="handleCallProduct('created_at')"
+                :class="[
+                    'cursor-pointer transition-all duration-200',
+                    activeTab === 'created_at'
+                        ? 'text-black underline underline-offset-4 decoration-2 decoration-black'
+                        : 'hover:font-semibold hover:underline hover:underline-offset-4 hover:decoration-2 hover:decoration-black',
+                ]"
             >
                 Mới nhất
             </div>
             <div
-                class="cursor-pointer hover:font-semibold hover:underline hover:underline-offset-4 hover:decoration-2 hover:decoration-black transition-all duration-200"
+                @click="handleCallProduct('sold')"
+                :class="[
+                    'cursor-pointer transition-all duration-200',
+                    activeTab === 'sold'
+                        ? 'text-black underline underline-offset-4 decoration-2 decoration-black'
+                        : 'hover:font-semibold hover:underline hover:underline-offset-4 hover:decoration-2 hover:decoration-black',
+                ]"
             >
                 Bán chạy
             </div>
             <div
-                class="cursor-pointer hover:font-semibold hover:underline hover:underline-offset-4 hover:decoration-2 hover:decoration-black transition-all duration-200"
+                @click="handleCallProduct('discount')"
+                :class="[
+                    'cursor-pointer transition-all duration-200',
+                    activeTab === 'discount'
+                        ? 'text-black underline underline-offset-4 decoration-2 decoration-black'
+                        : 'hover:font-semibold hover:underline hover:underline-offset-4 hover:decoration-2 hover:decoration-black',
+                ]"
             >
                 Khuyến mãi
             </div>
@@ -30,12 +48,10 @@
         <div class="flex gap-6">
             <!-- Left big promo block -->
             <div
-                class="flex flex-col justify-between bg-[#6B8443] text-white rounded-md p-6 w-[280px] h-[480px] shrink-0"
+                class="flex flex-col justify-between bg-[#eeb600] text-white rounded-md p-6 w-[280px] h-[480px] shrink-0"
             >
                 <div class="text-xl leading-snug font-semibold">
-                    Trái cây
-                    <br />
-                    tự nhiên
+                    Bánh ngon
                     <br />
                     mỗi ngày
                 </div>
@@ -48,7 +64,7 @@
                     alt="Fresh vegetables including carrots, green onions, and leafy greens in a mesh bag on a green background"
                     class="mt-6 rounded-md"
                     height="280"
-                    src="https://storage.googleapis.com/a1aa/image/ecd8100f-a632-4940-d857-853d7e490a35.jpg"
+                    :src="baseImageUrl + 'cheesecake.png'"
                     width="280"
                 />
             </div>
@@ -142,11 +158,16 @@
 
 <script setup>
 import { ref, computed } from "vue";
+import axios from "axios";
 import ProductCard from "./ProductCard.vue";
 
 const props = defineProps(["title", "products"]);
+const emit = defineEmits(["update:products"]);
 const currentSlide = ref(0);
+const activeTab = ref("created_at"); // Default active tab
 const productsPerPage = 10; // 5 products per row * 2 rows
+
+const baseImageUrl = import.meta.env.VITE_RESPONE_IMAGE_URL;
 
 const maxSlides = computed(() => {
     if (!props.products) return 0;
@@ -168,6 +189,20 @@ const nextSlide = () => {
 const prevSlide = () => {
     if (currentSlide.value > 0) {
         currentSlide.value--;
+    }
+};
+
+const handleCallProduct = async (sort) => {
+    console.log("Calling API with sort:", sort);
+    activeTab.value = sort; // Update active tab
+    try {
+        const response = await axios.get(
+            `/api/products?take=40&sort_by=${sort}`
+        );
+        console.log("API Response:", response.data);
+        emit("update:products", response.data.data);
+    } catch (error) {
+        console.error("Lỗi khi lấy sản phẩm:", error);
     }
 };
 

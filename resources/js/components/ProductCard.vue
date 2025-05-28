@@ -4,11 +4,13 @@
     >
         <!-- Image + Wishlist + Action buttons -->
         <div class="relative w-full h-[180px] overflow-hidden group">
-            <img
-                :alt="product.name"
-                class="w-full h-full object-cover rounded-md transition-transform duration-300 group-hover:scale-105"
-                :src="product.image"
-            />
+            <router-link :to="'products/' + product.id">
+                <img
+                    :alt="product.name"
+                    class="w-full h-full object-cover rounded-md transition-transform duration-300 group-hover:scale-105"
+                    :src="product.image"
+                />
+            </router-link>
             <div
                 class="absolute top-2 right-2 text-gray-400 cursor-pointer"
                 title="Add to wishlist"
@@ -16,7 +18,7 @@
                 <i class="far fa-heart"></i>
             </div>
 
-            <!-- Hover Buttons -->
+            <!-- Hover Buttons
             <div
                 class="absolute inset-0 bg-white bg-opacity-90 flex opacity-0 group-hover:opacity-100 transition-opacity rounded-md"
             >
@@ -37,7 +39,7 @@
                         class="far fa-eye transition-transform duration-200 hover:scale-125"
                     ></i>
                 </button>
-            </div>
+            </div> -->
         </div>
 
         <!-- Product Name & Price -->

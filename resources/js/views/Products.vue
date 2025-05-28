@@ -152,7 +152,7 @@ function saveCart() {
 onMounted(async () => {
     loadCart();
     try {
-        const response = await api.get("/products");
+        const response = await api.get("/products/all");
         products.value = response.data.data;
         // Khởi tạo selectedSizes cho từng sản phẩm có size
         for (const p of products.value) {
@@ -160,10 +160,73 @@ onMounted(async () => {
                 selectedSizes.value[p.id] = p.size[0];
             }
         }
+
+        console.log("Setting up WebSocket listener...");
+        console.log("Pusher key:", import.meta.env.VITE_PUSHER_APP_KEY);
+        console.log("Pusher cluster:", import.meta.env.VITE_PUSHER_APP_CLUSTER);
+        console.log("Echo config:", window.Echo);
+
+        window.Pusher = Pusher;
+        Pusher.logToConsole = true;
+
+        // Listen for product updates
+        const channel = window.Echo.channel("products");
+        console.log("Channel created:", channel);
+
+        // Listen for all events on the channel
+        channel.listenToAll((event, data) => {
+            console.log("Received event on channel:", event, data);
+        });
+
+        // Try different event names
+        channel.listen(".ProductUpdated", (e) => {
+            console.log("Received .ProductUpdated event:", e);
+            refreshProducts();
+        });
+
+        // channel.listen("ProductUpdated", (e) => {
+        //     console.log("Received ProductUpdated event:", e);
+        //     refreshProducts();
+        // });
+
+        // channel.listen("App\\Events\\ProductUpdated", (e) => {
+        //     console.log("Received App\\Events\\ProductUpdated event:", e);
+        //     refreshProducts();
+        // });
+
+        channel.error((error) => {
+            console.error("WebSocket error:", error);
+        });
+
+        // Test connection
+        channel.subscribed(() => {
+            console.log("Successfully subscribed to channel");
+        });
+
+        console.log("WebSocket listener set up successfully");
     } catch (error) {
         console.error("Lỗi khi lấy sản phẩm:", error);
     }
 });
+
+// Add refreshProducts function
+async function refreshProducts() {
+    console.log("Refreshing products...");
+    try {
+        const response = await api.get("/products/all");
+        console.log("New products data:", response.data.data);
+        products.value = response.data.data;
+        // Reinitialize selectedSizes for products with sizes
+        for (const p of products.value) {
+            if (p.size && p.size.length > 0) {
+                selectedSizes.value[p.id] = p.size[0];
+            }
+        }
+        console.log("Products refreshed successfully");
+    } catch (error) {
+        console.error("Lỗi khi cập nhật sản phẩm:", error);
+    }
+}
 
 // Gộp sản phẩm theo category_id, lấy category_name động
 const groupedProducts = computed(() => {
