@@ -50,6 +50,12 @@
                     {{ user?.name }}
                 </div>
                 <button
+                    @click="showEditModal = true"
+                    class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                    Chỉnh sửa thông tin
+                </button>
+                <button
                     @click="handleLogout"
                     class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 >
@@ -57,6 +63,14 @@
                 </button>
             </div>
         </div>
+
+        <!-- Edit User Modal -->
+        <EditUser
+            :show="showEditModal"
+            :user="user"
+            @close="showEditModal = false"
+            @updated="handleUserUpdated"
+        />
     </div>
 </template>
 
@@ -64,14 +78,19 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
+import EditUser from "./EditUser.vue";
 
 export default {
     name: "UserMenu",
+    components: {
+        EditUser,
+    },
     setup() {
         const router = useRouter();
         const isMenuOpen = ref(false);
         const isAuthenticated = ref(false);
         const user = ref(null);
+        const showEditModal = ref(false);
 
         const setUserCookie = (userData) => {
             const userStr = JSON.stringify(userData);
@@ -163,6 +182,11 @@ export default {
             }
         };
 
+        const handleUserUpdated = (updatedUser) => {
+            user.value = updatedUser;
+            isMenuOpen.value = false;
+        };
+
         // Close menu when clicking outside
         const handleClickOutside = (event) => {
             if (isMenuOpen.value && !event.target.closest(".user-menu")) {
@@ -183,8 +207,10 @@ export default {
             isMenuOpen,
             isAuthenticated,
             user,
+            showEditModal,
             toggleMenu,
             handleLogout,
+            handleUserUpdated,
         };
     },
 };

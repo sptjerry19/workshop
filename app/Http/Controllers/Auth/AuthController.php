@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Helpers\APIResponse;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -67,6 +70,24 @@ class AuthController extends Controller
             'user' => $user,
             'token' => $token
         ]);
+    }
+
+    public function update(Request $request)
+    {
+        $fields = $request->validate([
+            'name' => 'required|string',
+            'phone' => 'nullable|string',
+            'address' => 'nullable|string',
+        ]);
+        try {
+            $user = auth()->user();
+            $user->update($fields);
+
+            return APIResponse::success($user, __('update_profile_success'));
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return APIResponse::error(__('update_profile_failed'), 500);
+        }
     }
 
     public function logout(Request $request)
