@@ -25,10 +25,16 @@ class StoreRequest extends FormRequest
             'items' => 'required|array',
             'customer' => 'required|array',
             'customer.name' => 'required|string|max:255',
-            'customer.phone' => 'required|string|max:20',
+            'customer.phone'    => [
+                'required',
+                'string',
+                'max:20',
+                // <- notice the opening and closing `/` here:
+                'regex:/^(0|\+84)(3|5|7|8|9)\d{8}$/',
+            ],
             'customer.address' => 'required|string',
             'total' => 'required|numeric|min:0',
-            'user_id' => 'string|nullable',
+            'user_id' => 'nullable',
             'payment_method' => 'required|string|in:cod,momo,bank'
         ];
     }

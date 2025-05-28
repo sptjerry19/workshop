@@ -335,8 +335,8 @@ function getCookie(name) {
 }
 const customerInfo = ref({
     name: "",
-    phone: "087654321",
-    address: "tòa xyz Thành phố Hà Nội",
+    phone: "",
+    address: "",
 });
 const showOrderResult = ref(false);
 const orderSuccess = ref(false);
@@ -363,6 +363,8 @@ onMounted(() => {
             const decoded = decodeURIComponent(userCookie); // Step 2
             const user = JSON.parse(decoded); // Step 3
             customerInfo.value.name = user.name; // Step 4
+            customerInfo.value.phone = user.phone; // Step 5
+            customerInfo.value.address = user.address; // Step 6
         } catch (e) {
             console.error("Lỗi xử lý cookie user:", e);
         }

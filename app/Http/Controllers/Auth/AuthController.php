@@ -75,9 +75,14 @@ class AuthController extends Controller
     public function update(Request $request)
     {
         $fields = $request->validate([
-            'name' => 'required|string',
-            'phone' => 'nullable|string',
+            'name'    => 'required|string',
+            'phone'   => [
+                'nullable',
+                'regex:/^(0|\+84)(3|5|7|8|9)\d{8}$/'
+            ],
             'address' => 'nullable|string',
+        ], [
+            'phone.regex' => 'Số điện thoại không đúng định dạng Việt Nam (ví dụ: 0912345678 hoặc +84912345678).'
         ]);
         try {
             $user = auth()->user();
