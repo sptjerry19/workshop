@@ -38,7 +38,9 @@
                 class="hover:text-black transition"
                 type="button"
             >
-                <i class="far fa-heart"> </i>
+                <router-link to="/wishlist">
+                    <i class="far fa-heart"> </i>
+                </router-link>
             </button>
 
             <!-- Dropdown menu -->
