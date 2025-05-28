@@ -78,7 +78,10 @@
                                     }}
                                 </span>
                                 <span
-                                    v-if="product.discount === null"
+                                    v-if="
+                                        product.discount == null ||
+                                        parseFloat(product.discount) === 0
+                                    "
                                     class="text-lg font-bold text-gray-800"
                                 >
                                     {{

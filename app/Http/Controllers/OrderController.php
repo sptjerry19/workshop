@@ -99,6 +99,22 @@ class OrderController extends Controller
         return APIResponse::success($orders['items'], 'Orders fetched successfully', 200, $orders['pagination']);
     }
 
+    public function getHistories(Request $request)
+    {
+        $params = $request->only([
+            'q',
+            'status',
+            'payment_status',
+            'user_id',
+        ]);
+
+        $histories = $this->orderService->getHistories($params);
+        if (!$histories) {
+            return APIResponse::error('Failed to fetch order histories', 500);
+        }
+        return APIResponse::success($histories['items'], 'Order histories fetched successfully', 200, $histories['pagination']);
+    }
+
     public function generateQr(Request $request)
     {
         try {
