@@ -13,6 +13,7 @@ use App\Http\Controllers\MomoPaymentController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\WishlistController;
 
 Route::get('/', function () {
     return 'OK';
@@ -41,6 +42,11 @@ Route::middleware('jwt.auth')->group(function () {
 
     // update user
     Route::put('/user/update', [AuthController::class, 'update']);
+
+    // Wishlist routes
+    Route::get('/wishlist', [WishlistController::class, 'index']);
+    Route::post('/wishlist', [WishlistController::class, 'store']);
+    Route::delete('/wishlist/{id}', [WishlistController::class, 'destroy']);
 });
 
 // Payment routes

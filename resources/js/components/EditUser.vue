@@ -35,6 +35,8 @@
                         v-model="formData.phone"
                         type="tel"
                         required
+                        pattern="^(0|\+84)(3|5|7|8|9)\d{8}$"
+                        title="Số điện thoại phải bắt đầu 0 hoặc +84, tiếp theo 3|5|7|8|9 và còn 8 số"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#d80000] focus:ring-[#d80000]"
                     />
                 </div>

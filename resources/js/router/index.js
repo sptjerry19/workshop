@@ -14,6 +14,7 @@ import OrdersAdmin from "../views/admin/Orders.vue";
 import UsersAdmin from "../views/admin/Users.vue";
 import CategoriesAdmin from "../views/admin/Categories.vue";
 import GoogleCallback from "../views/auth/GoogleCallback.vue";
+import Wishlist from "../views/Wishlist.vue";
 
 const routes = [
     {
@@ -26,6 +27,12 @@ const routes = [
         path: "/cart",
         name: "cart",
         component: Cart,
+    },
+    {
+        path: "/wishlist",
+        name: "wishlist",
+        component: Wishlist,
+        meta: { requiresAuth: true },
     },
     {
         path: "/login",

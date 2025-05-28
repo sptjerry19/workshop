@@ -43,6 +43,13 @@ class Product extends Model
 
     public function transform()
     {
+        $isFavorite = false;
+        if (auth()->check()) {
+            $isFavorite = $this->wishlists()
+                ->where('user_id', auth()->id())
+                ->exists();
+        }
+
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -57,6 +64,12 @@ class Product extends Model
             'category_name' => optional($this->category)->name,
             'stock' => $this->stock,
             'discount' => $this->discount,
+            'is_favorite' => $isFavorite,
         ];
+    }
+
+    public function wishlists()
+    {
+        return $this->hasMany(Wishlist::class);
     }
 }

@@ -13,9 +13,19 @@
             </router-link>
             <div
                 class="absolute top-2 right-2 text-gray-400 cursor-pointer"
-                title="Add to wishlist"
+                :class="{ 'text-[#d80000]': product.is_favorite }"
+                :title="
+                    product.is_favorite
+                        ? 'Remove from wishlist'
+                        : 'Add to wishlist'
+                "
+                @click="toggleWishlist"
             >
-                <i class="far fa-heart"></i>
+                <i
+                    :class="
+                        product.is_favorite ? 'fas fa-heart' : 'far fa-heart'
+                    "
+                ></i>
             </div>
 
             <!-- Hover Buttons
@@ -77,18 +87,43 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from "vue";
+import { ref, watch } from "vue";
+import axios from "axios";
 
 const props = defineProps(["product"]);
 const selectedSize = ref(null);
 
-onMounted(() => {
-    if (props.product?.size?.length > 0) {
-        selectedSize.value = props.product.size[0];
-    }
-});
+if (props.product?.size?.length > 0) {
+    selectedSize.value = props.product.size[0];
+}
 
-// Nếu muốn theo dõi props thay đổi (nếu product là động)
+// Toggle wishlist status
+async function toggleWishlist() {
+    try {
+        if (props.product.is_favorite) {
+            // Remove from wishlist
+            const wishlistItem = await axios.get("/api/wishlist");
+            const item = wishlistItem.data.data.find(
+                (item) => item.product.id === props.product.id
+            );
+            if (item) {
+                await axios.delete(`/api/wishlist/${item.id}`);
+                props.product.is_favorite = false;
+            }
+        } else {
+            // Add to wishlist
+            await axios.post("/api/wishlist", {
+                product_id: props.product.id,
+            });
+            props.product.is_favorite = true;
+        }
+    } catch (error) {
+        console.error("Error toggling wishlist:", error);
+        alert("Có lỗi xảy ra khi thêm/xóa sản phẩm khỏi danh sách yêu thích");
+    }
+}
+
+// Watch for product changes
 watch(
     () => props.product,
     (newProduct) => {
