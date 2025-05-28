@@ -2,11 +2,51 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\MomoService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use App\Models\Order;
+use App\Models\Payment;
 
 class PaymentController extends Controller
 {
+    protected $momoService;
+
+    public function __construct(MomoService $momoService)
+    {
+        $this->momoService = $momoService;
+    }
+
+    public function create(Request $request)
+    {
+        $request->validate([
+            'amount' => 'required|numeric',
+            'orderInfo' => 'required|string'
+        ]);
+
+        $returnUrl = route('payment.return');
+        $notifyUrl = route('payment.notify');
+
+        $response = $this->momoService->createPayment(
+            $request->amount,
+            $request->orderInfo,
+            $returnUrl,
+            $notifyUrl
+        );
+
+        if ($response['resultCode'] === 0) {
+            return response()->json([
+                'success' => true,
+                'paymentId' => $response['requestId'],
+                'qrCodeUrl' => $response['qrCodeUrl'] ?? $response['payUrl']
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => $response['message'] ?? 'Không thể tạo thanh toán'
+        ], 400);
+    }
+
     public function createPayment(Request $request)
     {
         $validated = $request->validate([
@@ -30,23 +70,88 @@ class PaymentController extends Controller
         ]);
     }
 
-    public function handleIPN(Request $request)
+    public function checkStatus($paymentId)
     {
-        Log::info('IPN received', $request->all());
+        $payment = Payment::where('payment_id', $paymentId)->first();
 
-        // TODO: Implement actual IPN handling logic
+        if (!$payment) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy thanh toán'
+            ], 404);
+        }
+
         return response()->json([
-            'message' => 'IPN received successfully'
+            'success' => true,
+            'status' => $payment->status
         ]);
     }
 
-    public function handleRedirect(Request $request)
+    public function return(Request $request)
     {
-        Log::info('Payment redirect', $request->all());
+        $isValid = $this->momoService->verifyPayment(
+            $request->requestId,
+            $request->orderId,
+            $request->amount,
+            $request->orderInfo,
+            $request->orderType,
+            $request->transId,
+            $request->resultCode,
+            $request->message,
+            $request->payType,
+            $request->signature
+        );
 
-        // TODO: Implement actual redirect handling logic
-        return response()->json([
-            'message' => 'Payment redirect handled successfully'
-        ]);
+        if ($isValid && $request->resultCode === 0) {
+            $payment = Payment::where('payment_id', $request->requestId)->first();
+            if ($payment) {
+                $payment->update([
+                    'status' => 'completed',
+                    'transaction_id' => $request->transId
+                ]);
+
+                if ($payment->order) {
+                    $payment->order->update(['status' => 'paid']);
+                }
+            }
+
+            return redirect()->route('payment.success');
+        }
+
+        return redirect()->route('payment.failed');
+    }
+
+    public function notify(Request $request)
+    {
+        $isValid = $this->momoService->verifyPayment(
+            $request->requestId,
+            $request->orderId,
+            $request->amount,
+            $request->orderInfo,
+            $request->orderType,
+            $request->transId,
+            $request->resultCode,
+            $request->message,
+            $request->payType,
+            $request->signature
+        );
+
+        if ($isValid && $request->resultCode === 0) {
+            $payment = Payment::where('payment_id', $request->requestId)->first();
+            if ($payment) {
+                $payment->update([
+                    'status' => 'completed',
+                    'transaction_id' => $request->transId
+                ]);
+
+                if ($payment->order) {
+                    $payment->order->update(['status' => 'paid']);
+                }
+            }
+
+            return response()->json(['success' => true]);
+        }
+
+        return response()->json(['success' => false], 400);
     }
 }

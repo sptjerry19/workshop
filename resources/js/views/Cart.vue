@@ -435,13 +435,16 @@ async function handlePaymentMethod(method) {
         if (response.data.success) {
             cartItems.value = [];
             saveCart();
+            if (method === "momo") {
+                await createMomoPayment(
+                    response.data.data.id,
+                    Math.round(response.data.data.total_amount)
+                );
+                return;
+            }
             orderSuccess.value = true;
             showOrderResult.value = true;
             showPaymentOptions.value = false;
-
-            if (method === "momo") {
-                await createMomoPayment();
-            }
         }
     } catch (error) {
         orderSuccess.value = false;
@@ -506,15 +509,19 @@ function generateOrderNumber() {
     return "ORDER_" + now.getTime(); // Hoặc thêm prefix bạn muốn
 }
 
-async function createMomoPayment() {
+async function createMomoPayment(orderId, amount) {
     try {
         const paymentData = {
-            amount: totalPrice.value,
+            amount: amount,
+            order_id: orderId, // Tạo mã đơn hàng tạm
             currency: "VND",
             description: `Thanh toan don hang - ${customerInfo.value.name} - ${customerInfo.value.phone} - ${customerInfo.value.address}`,
         };
 
-        const response = await axios.post("/api/payment/create", paymentData);
+        const response = await axios.post(
+            "/api/payment/momo/create",
+            paymentData
+        );
 
         if (response.data.success) {
             paymentId.value = response.data.payment.id;
@@ -525,7 +532,7 @@ async function createMomoPayment() {
             } else {
                 // Get QR code URL from payment response
                 const qrResponse = await axios.get(
-                    `/api/payment/${paymentId.value}/qr`
+                    `/api/payment/momo/${paymentId.value}/qr`
                 );
                 if (qrResponse.data.success) {
                     momoQRUrl.value = qrResponse.data.qrCodeUrl;
@@ -550,20 +557,39 @@ async function pollPaymentStatus() {
     const checkStatus = async () => {
         try {
             const response = await axios.get(
-                `/api/payment/${paymentId.value}/status`
+                `/api/payment/momo/${paymentId.value}/status`
             );
 
             if (response.data.status === "completed") {
-                // Payment successful
-                showMomoQR.value = false;
-                cartItems.value = [];
-                saveCart();
-                alert("Thanh toán thành công!");
+                // Thanh toán thành công, tạo đơn hàng
+                const orderData = {
+                    items: cartItems.value,
+                    customer: customerInfo.value,
+                    total: totalPrice.value,
+                    payment_method: "momo",
+                    payment_id: paymentId.value,
+                };
+
+                const orderResponse = await axios.post(
+                    "/api/orders",
+                    orderData
+                );
+
+                if (orderResponse.data.success) {
+                    showMomoQR.value = false;
+                    cartItems.value = [];
+                    saveCart();
+                    orderSuccess.value = true;
+                    showOrderResult.value = true;
+                }
             } else if (response.data.status === "failed") {
                 showMomoQR.value = false;
-                alert("Thanh toán thất bại. Vui lòng thử lại.");
+                orderSuccess.value = false;
+                orderErrorMessage.value =
+                    "Thanh toán thất bại. Vui lòng thử lại.";
+                showOrderResult.value = true;
             } else {
-                // Continue polling
+                // Tiếp tục kiểm tra
                 setTimeout(checkStatus, 3000);
             }
         } catch (error) {
