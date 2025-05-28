@@ -422,10 +422,6 @@ async function handlePaymentMethod(method) {
         return;
     }
 
-    if (method === "momo") {
-        await createMomoPayment();
-    }
-
     try {
         const orderData = {
             items: cartItems.value,
@@ -439,6 +435,13 @@ async function handlePaymentMethod(method) {
         if (response.data.success) {
             cartItems.value = [];
             saveCart();
+            if (method === "momo") {
+                await createMomoPayment(
+                    response.data.data.id,
+                    Math.round(response.data.data.total_amount)
+                );
+                return;
+            }
             orderSuccess.value = true;
             showOrderResult.value = true;
             showPaymentOptions.value = false;
@@ -506,10 +509,11 @@ function generateOrderNumber() {
     return "ORDER_" + now.getTime(); // Hoặc thêm prefix bạn muốn
 }
 
-async function createMomoPayment() {
+async function createMomoPayment(orderId, amount) {
     try {
         const paymentData = {
-            amount: totalPrice.value,
+            amount: amount,
+            order_id: orderId, // Tạo mã đơn hàng tạm
             currency: "VND",
             description: `Thanh toan don hang - ${customerInfo.value.name} - ${customerInfo.value.phone} - ${customerInfo.value.address}`,
         };

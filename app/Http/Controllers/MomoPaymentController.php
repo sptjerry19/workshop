@@ -26,7 +26,7 @@ class MomoPaymentController extends Controller
     public function createPayment(Request $request)
     {
         $requestId = time() . "";
-        $orderId = time() . "";
+        $orderId = $request->get('order_id');
         $requestType = "captureWallet";
         $extraData = "";
 
@@ -78,6 +78,7 @@ class MomoPaymentController extends Controller
             if ($result['resultCode'] == 0) {
                 // Lưu thông tin payment
                 $payment = Payment::create([
+                    'order_id' => $orderId,
                     'payment_method' => 'momo',
                     'amount' => $request->amount,
                     'transaction_id' => $requestId,
@@ -201,7 +202,7 @@ class MomoPaymentController extends Controller
         $payment = Payment::where('transaction_id', $request->requestId)->first();
 
         if (!$payment) {
-            return redirect()->route('cart.index')->with('error', 'Không tìm thấy thông tin thanh toán');
+            return redirect('/cart')->with('error', 'Không tìm thấy thông tin thanh toán');
         }
 
         if ($request->resultCode == 0) {
@@ -213,11 +214,11 @@ class MomoPaymentController extends Controller
                 ])
             ]);
 
-            return redirect()->route('cart.index')
+            return redirect('/cart')
                 ->with('success', 'Thanh toán thành công');
         }
 
-        return redirect()->route('cart.index')
+        return redirect('/cart')
             ->with('error', 'Thanh toán thất bại: ' . $request->message);
     }
 
