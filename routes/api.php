@@ -18,6 +18,14 @@ use App\Http\Controllers\WishlistController;
 Route::get('/', function () {
     return 'OK';
 });
+
+
+
+Route::get('/orders/histories', function () {
+    return 'OK1111';
+});
+
+
 // Public routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -73,6 +81,7 @@ Route::apiResource('products', ProductController::class);
 // Order Routes
 Route::prefix('orders')->group(function () {
     Route::get('/', [OrderController::class, 'index']);
+    Route::get('/{order}', [OrderController::class, 'show']);
     Route::get('/histories', [OrderController::class, 'getHistories']);
     Route::post('/', [OrderController::class, 'store']);
     // Route::get('/{id}', [OrderController::class, 'show']);

@@ -11,6 +11,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
+use App\Events\OrderStatusUpdated;
 
 class OrderController extends Controller
 {
@@ -44,33 +45,33 @@ class OrderController extends Controller
     {
         try {
             $order = Order::findOrFail($id);
-            return response()->json([
-                'success' => true,
-                'order' => $order
-            ]);
+            return APIResponse::success($order, __("show_order_success"));
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Order not found'
-            ], 404);
+            return APIResponse::error(__("show_order_failed"), 500);
         }
     }
 
     public function updateStatus(Request $request, $id)
     {
         try {
-            $validated = $request->validate([
-                'order_status' => 'required|string|in:pending,processing,completed,cancelled',
-                'payment_status' => 'required|string|in:pending,paid,failed'
+            $order = Order::findOrFail($id);
+
+            $request->validate([
+                'order_status' => 'required|in:pending,processing,completed,cancelled',
+                'payment_status' => 'required|in:pending,paid,failed'
             ]);
 
-            $order = Order::findOrFail($id);
-            $order->update($validated);
+            $order->update([
+                'order_status' => $request->order_status,
+                'payment_status' => $request->payment_status
+            ]);
+
+            // Broadcast the status update
+            broadcast(new OrderStatusUpdated($order))->toOthers();
 
             Log::info('Order status updated', [
                 'order_id' => $order->id,
                 'order_number' => $order->order_number,
-                'new_status' => $validated
             ]);
 
             return APIResponse::success([], 'Order status updated successfully', 200);
@@ -101,18 +102,24 @@ class OrderController extends Controller
 
     public function getHistories(Request $request)
     {
-        $params = $request->only([
-            'q',
-            'status',
-            'payment_status',
-            'user_id',
-        ]);
+        try {
+            $params = $request->only([
+                'q',
+                'status',
+                'payment_status',
+                'user_id',
+            ]);
 
-        $histories = $this->orderService->getHistories($params);
-        if (!$histories) {
+
+            $histories = $this->orderService->getHistoriesByUser($params);
+            if (!$histories) {
+                return APIResponse::error('Failed to fetch order histories', 500);
+            }
+            return APIResponse::success($histories['items'], 'Order histories fetched successfully', 200, $histories['pagination']);
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
             return APIResponse::error('Failed to fetch order histories', 500);
         }
-        return APIResponse::success($histories['items'], 'Order histories fetched successfully', 200, $histories['pagination']);
     }
 
     public function generateQr(Request $request)

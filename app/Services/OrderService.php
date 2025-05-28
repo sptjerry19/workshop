@@ -33,7 +33,7 @@ class OrderService extends BaseService
         }
     }
 
-    public function getHistories(array $params)
+    public function getHistoriesByUser(array $params)
     {
         $keyword = $params['q'] ?? null;
         $status = $params['status'] ?? null;

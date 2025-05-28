@@ -110,6 +110,14 @@ const routes = [
         name: "GoogleCallback",
         component: GoogleCallback,
     },
+    {
+        path: "/orders/:id/tracking",
+        name: "order-tracking",
+        component: () => import("@/components/OrderTracking.vue"),
+        meta: {
+            requiresAuth: true,
+        },
+    },
 ];
 
 const router = createRouter({

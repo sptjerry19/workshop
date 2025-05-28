@@ -149,17 +149,20 @@
                             <td
                                 class="px-6 py-4 whitespace-nowrap text-sm font-medium"
                             >
-                                <button
-                                    @click="showOrderDetails(order)"
+                                <router-link
+                                    :to="{
+                                        name: 'order-tracking',
+                                        params: { id: order.id },
+                                    }"
                                     class="text-blue-600 hover:text-blue-900 mr-3"
                                 >
-                                    View
-                                </button>
+                                    Xem chi tiết
+                                </router-link>
                                 <button
                                     @click="showUpdateStatusModal(order)"
                                     class="text-green-600 hover:text-green-900"
                                 >
-                                    Update Status
+                                    Cập nhật trạng thái
                                 </button>
                             </td>
                         </tr>
@@ -404,6 +407,7 @@
 import { ref, onMounted, computed } from "vue";
 import AdminLayout from "@/layouts/AdminLayout.vue";
 import axios from "axios";
+import Echo from "laravel-echo";
 
 const orders = ref({
     data: [],
@@ -511,6 +515,21 @@ async function updateOrderStatus() {
         if (response.data.success) {
             showStatusModal.value = false;
             fetchOrders();
+
+            // Broadcast the status update
+            const echo = new Echo({
+                broadcaster: "pusher",
+                key: import.meta.env.VITE_PUSHER_APP_KEY,
+                cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+                forceTLS: true,
+            });
+
+            echo.private(`order.${updateData.value.order_id}`).whisper(
+                "OrderStatusUpdated",
+                {
+                    order: response.data.data,
+                }
+            );
         }
     } catch (error) {
         console.error("Failed to update order status:", error);

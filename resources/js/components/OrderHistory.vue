@@ -22,80 +22,103 @@
                 :key="order.id"
                 class="bg-white rounded-lg shadow p-6"
             >
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <h3 class="text-lg font-semibold">
-                            Đơn hàng #{{ order.id }}
-                        </h3>
-                        <p class="text-sm text-gray-500">
-                            {{ formatDate(order.created_at) }}
-                        </p>
-                    </div>
-                    <div class="text-right">
-                        <span
-                            :class="getStatusClass(order.order_status)"
-                            class="px-3 py-1 rounded-full text-sm"
-                        >
-                            {{ getStatusText(order.order_status) }}
-                        </span>
-                        <p class="text-lg font-bold text-[#d80000] mt-2">
-                            {{ formatPrice(order.total_amount) }}
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Order items -->
-                <div class="border-t pt-4">
-                    <div
-                        v-for="item in order.order_items"
-                        :key="item.id"
-                        class="flex items-center gap-4 mb-4"
-                    >
-                        <img
-                            :src="item.product.image"
-                            :alt="item.product.name"
-                            class="w-16 h-16 object-cover rounded"
-                        />
-                        <div class="flex-1">
-                            <h4 class="font-medium">{{ item.product.name }}</h4>
+                <router-link
+                    :to="{
+                        name: 'order-tracking',
+                        params: { id: order.id },
+                    }"
+                >
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold">
+                                Đơn hàng #{{ order.id }}
+                            </h3>
                             <p class="text-sm text-gray-500">
-                                Số lượng: {{ item.quantity }}
-                            </p>
-                            <p class="text-sm text-gray-500">
-                                {{ formatPrice(item.price) }}
+                                {{ formatDate(order.created_at) }}
                             </p>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Order details -->
-                <div class="border-t pt-4 mt-4">
-                    <div class="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                            <p class="text-gray-600">Phương thức thanh toán:</p>
-                            <p class="font-medium">
-                                {{ getPaymentMethodText(order.payment_method) }}
-                            </p>
-                        </div>
-                        <div>
-                            <p class="text-gray-600">Trạng thái thanh toán:</p>
-                            <p
-                                :class="
-                                    getPaymentStatusClass(order.payment_status)
-                                "
-                                class="font-medium"
+                        <div class="text-right">
+                            <span
+                                :class="getStatusClass(order.order_status)"
+                                class="px-3 py-1 rounded-full text-sm"
                             >
-                                {{ getPaymentStatusText(order.payment_status) }}
-                            </p>
-                        </div>
-                        <div class="col-span-2">
-                            <p class="text-gray-600">Địa chỉ giao hàng:</p>
-                            <p class="font-medium">
-                                {{ order.customer_address }}
+                                {{ getStatusText(order.order_status) }}
+                            </span>
+                            <p class="text-lg font-bold text-[#d80000] mt-2">
+                                {{ formatPrice(order.total_amount) }}
                             </p>
                         </div>
                     </div>
-                </div>
+
+                    <!-- Order items -->
+                    <div class="border-t pt-4">
+                        <div
+                            v-for="item in order.order_items"
+                            :key="item.id"
+                            class="flex items-center gap-4 mb-4"
+                        >
+                            <img
+                                :src="item.product.image"
+                                :alt="item.product.name"
+                                class="w-16 h-16 object-cover rounded"
+                            />
+                            <div class="flex-1">
+                                <h4 class="font-medium">
+                                    {{ item.product.name }}
+                                </h4>
+                                <p class="text-sm text-gray-500">
+                                    Số lượng: {{ item.quantity }}
+                                </p>
+                                <p class="text-sm text-gray-500">
+                                    {{ formatPrice(item.price) }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order details -->
+                    <div class="border-t pt-4 mt-4">
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <p class="text-gray-600">
+                                    Phương thức thanh toán:
+                                </p>
+                                <p class="font-medium">
+                                    {{
+                                        getPaymentMethodText(
+                                            order.payment_method
+                                        )
+                                    }}
+                                </p>
+                            </div>
+                            <div>
+                                <p class="text-gray-600">
+                                    Trạng thái thanh toán:
+                                </p>
+                                <p
+                                    :class="
+                                        getPaymentStatusClass(
+                                            order.payment_status
+                                        )
+                                    "
+                                    class="font-medium"
+                                >
+                                    {{
+                                        getPaymentStatusText(
+                                            order.payment_status
+                                        )
+                                    }}
+                                </p>
+                            </div>
+                            <div class="col-span-2">
+                                <p class="text-gray-600">Địa chỉ giao hàng:</p>
+                                <p class="font-medium">
+                                    {{ order.customer_address }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </router-link>
             </div>
         </div>
 
