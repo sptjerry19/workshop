@@ -38,6 +38,9 @@ Route::middleware('jwt.auth')->group(function () {
     // Route::post('/products', [ProductController::class, 'store']);
     Route::put('/products/{product}', [ProductController::class, 'update']);
     Route::delete('/products/{product}', [ProductController::class, 'destroy']);
+
+    // update user
+    Route::put('/user/update', [AuthController::class, 'update']);
 });
 
 // Payment routes
