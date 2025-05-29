@@ -513,9 +513,10 @@ const filters = ref({
 
 const showCreateModal = ref(false);
 const showEditModal = ref(false);
-const form = ref({
+
+const getDefaultForm = () => ({
     name: "",
-    image: null, // Base64 string
+    image: null,
     price: 0,
     size: [
         { label: "S", price: 0 },
@@ -528,8 +529,9 @@ const form = ref({
     description: "",
     category_id: "",
     stock: 0,
-    discount: null, // percent or price
+    discount: null,
 });
+const form = ref(getDefaultForm());
 
 const pages = computed(() => {
     const total = products.value.pagination.last_page;
@@ -643,6 +645,7 @@ async function submitForm() {
         const response = await axios[method](url, form.value); // Gửi raw JSON
 
         if (response.data.success) {
+            form.value = getDefaultForm();
             closeModal();
             fetchProducts();
         }
@@ -654,16 +657,6 @@ async function submitForm() {
 function closeModal() {
     showCreateModal.value = false;
     showEditModal.value = false;
-    form.value = {
-        id: null,
-        name: "",
-        description: "",
-        category_id: "",
-        price: 0,
-        stock: 0,
-        status: "active",
-        image: null,
-    };
 }
 
 function prevPage() {

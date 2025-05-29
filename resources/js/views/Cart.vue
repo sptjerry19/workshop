@@ -58,7 +58,7 @@
                             >{{ formatPrice(item.price) }}</span
                         >
                         <span
-                            v-if="item.discount === 0"
+                            v-if="item.discount === 0 || item.discount == null"
                             class="text-base font-bold text-gray-800"
                             >{{ formatPrice(item.price) }}</span
                         >
