@@ -13,6 +13,7 @@ use App\Http\Controllers\MomoPaymentController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\NewController;
 use App\Http\Controllers\WishlistController;
 
 Route::get('/', function () {
@@ -27,12 +28,19 @@ Route::get('/orders/histories', function () {
 
 
 // Public routes
+// auth
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+
+// product
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/all', [ProductController::class, 'indexAll']);
 Route::get('/products/{product}', [ProductController::class, 'show']);
 Route::get('/categories', [CategoryController::class, 'index']);
+
+// news
+Route::get('/news', [NewController::class, 'index']);
+Route::get('/news/{id}', [NewController::class, 'show']);
 
 
 // Protected routes
@@ -118,11 +126,11 @@ Route::middleware(['jwt.auth'])->prefix('admin')->group(function () {
     Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);
 
     // News
-    Route::get('/news', [AdminController::class, 'news']);
-    Route::post('/news', [AdminController::class, 'createNews']);
-    Route::get('/news/{news}', [AdminController::class, 'showNews']);
-    Route::put('/news/{news}', [AdminController::class, 'updateNews']);
-    Route::delete('/news/{news}', [AdminController::class, 'deleteNews']);
+    Route::get('/news', [NewController::class, 'index']);
+    Route::post('/news', [NewController::class, 'store']);
+    Route::get('/news/{news}', [NewController::class, 'show']);
+    Route::put('/news/{news}', [NewController::class, 'update']);
+    Route::delete('/news/{news}', [NewController::class, 'destroy']);
 
     // Users
     Route::get('/users', [AdminController::class, 'users']);

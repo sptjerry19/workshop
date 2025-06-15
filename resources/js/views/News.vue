@@ -13,30 +13,31 @@
         </div>
 
         <!-- Featured Post -->
-        <div class="mb-12">
+        <div class="mb-12" v-if="news.length > 0">
             <div class="bg-white rounded-lg shadow-lg overflow-hidden">
                 <img
-                    src="https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&h=600&q=80"
-                    alt="Featured post"
+                    :src="news[0].image"
+                    :alt="news[0].title"
                     class="w-full h-96 object-cover"
                 />
                 <div class="p-8">
                     <div class="flex items-center text-sm text-gray-500 mb-4">
-                        <span>20 Tháng 3, 2024</span>
+                        <span>{{ formatDate(news[0].created_at) }}</span>
                         <span class="mx-2">•</span>
-                        <span>5 phút đọc</span>
+                        <span>{{
+                            news[0].status === "published"
+                                ? "Đã xuất bản"
+                                : "Bản nháp"
+                        }}</span>
                     </div>
                     <h2 class="text-3xl font-bold text-gray-900 mb-4">
-                        Lợi ích của việc ăn trái cây và rau củ mỗi ngày
+                        {{ news[0].title }}
                     </h2>
                     <p class="text-gray-600 mb-6">
-                        Trái cây và rau củ là nguồn cung cấp vitamin, khoáng
-                        chất và chất xơ quan trọng cho cơ thể. Việc tiêu thụ đều
-                        đặn các loại thực phẩm này giúp tăng cường sức khỏe và
-                        phòng ngừa bệnh tật.
+                        {{ news[0].summary }}
                     </p>
-                    <a
-                        href="#"
+                    <router-link
+                        :to="'/news/' + news[0].id"
                         class="inline-flex items-center text-green-600 hover:text-green-700"
                     >
                         Đọc thêm
@@ -53,7 +54,7 @@
                                 d="M9 5l7 7-7 7"
                             />
                         </svg>
-                    </a>
+                    </router-link>
                 </div>
             </div>
         </div>
@@ -61,34 +62,37 @@
         <!-- Recent Posts Grid -->
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div
-                v-for="i in 6"
-                :key="i"
+                v-for="article in news.slice(1)"
+                :key="article.id"
                 class="bg-white rounded-lg shadow-md overflow-hidden"
             >
                 <img
-                    src="https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&h=300&q=80"
-                    alt="Blog post"
+                    :src="article.image"
+                    :alt="article.title"
                     class="w-full h-48 object-cover"
                 />
                 <div class="p-6">
                     <div class="flex items-center text-sm text-gray-500 mb-4">
-                        <span>15 Tháng 3, 2024</span>
+                        <span>{{ formatDate(article.created_at) }}</span>
                         <span class="mx-2">•</span>
-                        <span>3 phút đọc</span>
+                        <span>{{
+                            article.status === "published"
+                                ? "Đã xuất bản"
+                                : "Bản nháp"
+                        }}</span>
                     </div>
                     <h3 class="text-xl font-semibold text-gray-900 mb-2">
-                        Cách chọn và bảo quản trái cây tươi ngon
+                        {{ article.title }}
                     </h3>
                     <p class="text-gray-600 mb-4">
-                        Hướng dẫn chi tiết về cách chọn và bảo quản các loại
-                        trái cây để giữ được độ tươi ngon lâu nhất.
+                        {{ article.summary }}
                     </p>
-                    <a
-                        href="#"
+                    <router-link
+                        :to="'/news/' + article.id"
                         class="text-green-600 hover:text-green-700 font-medium"
                     >
                         Đọc thêm →
-                    </a>
+                    </router-link>
                 </div>
             </div>
         </div>
@@ -122,6 +126,28 @@
 </template>
 
 <script setup>
-// Component logic here
+import { ref, onMounted } from "vue";
 import Banner from "../components/Banner.vue";
+import api from "../api.js";
+
+const news = ref([]);
+
+onMounted(async () => {
+    try {
+        const response = await api.get("/news");
+        if (response.data.success) {
+            news.value = response.data.data;
+        }
+    } catch (error) {
+        console.error("Failed to fetch news:", error);
+    }
+});
+
+function formatDate(date) {
+    return new Date(date).toLocaleDateString("vi-VN", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+    });
+}
 </script>

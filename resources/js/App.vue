@@ -2,6 +2,7 @@
     <div>
         <router-view></router-view>
         <Notification />
+        <LoadingOverlay />
     </div>
 </template>
 
@@ -11,6 +12,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import Notification from "./components/Notification.vue";
+import LoadingOverlay from "./components/LoadingOverlay.vue";
 import Echo from "laravel-echo";
 import Pusher from "pusher-js";
 // TODO: Add SDKs for Firebase products that you want to use

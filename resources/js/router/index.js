@@ -6,6 +6,7 @@ import Home from "../views/Home.vue";
 import About from "../views/About.vue";
 import Products from "../views/Products.vue";
 import News from "../views/News.vue";
+import NewsDetail from "../views/NewsDetail.vue";
 import Contact from "../views/Contact.vue";
 import Cart from "../views/Cart.vue";
 import ProductsAdmin from "../views/admin/Products.vue";
@@ -60,6 +61,11 @@ const routes = [
         path: "/news",
         name: "news",
         component: News,
+    },
+    {
+        path: "/news/:id",
+        name: "news-detail",
+        component: NewsDetail,
     },
     {
         path: "/contact",
