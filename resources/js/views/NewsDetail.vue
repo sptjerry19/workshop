@@ -51,9 +51,10 @@
                     <p class="text-xl text-gray-600 mb-8">
                         {{ article.summary }}
                     </p>
-                    <div class="text-gray-700 whitespace-pre-line">
-                        {{ article.content }}
-                    </div>
+                    <div
+                        class="text-gray-700 prose prose-sm max-w-none"
+                        v-html="article.content"
+                    ></div>
                 </div>
             </div>
         </div>
@@ -104,3 +105,43 @@ function formatDate(date) {
     });
 }
 </script>
+
+<style>
+.prose {
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+.prose p {
+    margin-bottom: 1em;
+    white-space: pre-wrap;
+}
+
+.prose img {
+    max-width: 100%;
+    height: auto;
+}
+
+.prose table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1em;
+}
+
+.prose td,
+.prose th {
+    border: 1px solid #e5e7eb;
+    padding: 0.5em;
+}
+
+.prose pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    background-color: #f3f4f6;
+    padding: 1em;
+    border-radius: 0.375rem;
+    margin-bottom: 1em;
+}
+</style>
