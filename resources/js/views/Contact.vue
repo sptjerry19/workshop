@@ -15,7 +15,7 @@
                 <h2 class="text-2xl font-semibold text-gray-900 mb-6">
                     Gửi tin nhắn cho chúng tôi
                 </h2>
-                <form class="space-y-6">
+                <form class="space-y-6" @submit.prevent="submitForm">
                     <div>
                         <label
                             for="name"
@@ -25,6 +25,7 @@
                         <input
                             type="text"
                             id="name"
+                            v-model="name"
                             class="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                         />
                     </div>
@@ -37,6 +38,7 @@
                         <input
                             type="email"
                             id="email"
+                            v-model="email"
                             class="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                         />
                     </div>
@@ -49,6 +51,7 @@
                         <input
                             type="tel"
                             id="phone"
+                            v-model="phone"
                             class="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                         />
                     </div>
@@ -60,6 +63,7 @@
                         >
                         <select
                             id="subject"
+                            v-model="type"
                             class="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                         >
                             <option value="">Chọn chủ đề</option>
@@ -77,6 +81,7 @@
                         >
                         <textarea
                             id="message"
+                            v-model="subject"
                             rows="4"
                             class="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                         ></textarea>
@@ -218,6 +223,46 @@
 </template>
 
 <script setup>
-// Component logic here
+import { ref } from "vue";
+import axios from "axios";
 import Banner from "../components/Banner.vue";
+
+// Khởi tạo API client
+const api = axios.create({
+    baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api",
+    withCredentials: true,
+    headers: {
+        "X-Requested-With": "XMLHttpRequest",
+    },
+});
+
+// Các biến form
+const name = ref("");
+const email = ref("");
+const phone = ref("");
+const subject = ref("");
+const type = ref("support"); // Có thể điều chỉnh hoặc tự động set từ subject
+
+// Gửi form
+const submitForm = async () => {
+    try {
+        const response = await api.post("/contact", {
+            name: name.value,
+            email: email.value,
+            phone: phone.value,
+            subject: subject.value,
+            type: type.value,
+        });
+
+        alert("Gửi liên hệ thành công!");
+        // Reset form
+        name.value = "";
+        email.value = "";
+        phone.value = "";
+        subject.value = "";
+    } catch (error) {
+        console.error("Lỗi khi gửi liên hệ:", error);
+        alert("Đã xảy ra lỗi, vui lòng thử lại sau.");
+    }
+};
 </script>

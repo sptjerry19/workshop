@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Auth;
 
 use App\Helpers\APIResponse;
 use App\Http\Controllers\Controller;
+use App\Models\Contact;
 use App\Models\User;
+use App\Services\AuthService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,6 +18,12 @@ use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
+    protected $authService;
+    public function __construct(AuthService $authService)
+    {
+        $this->authService = $authService;
+    }
+
     private function generateToken($user)
     {
         $payload = [
@@ -93,6 +101,41 @@ class AuthController extends Controller
             Log::error($e->getMessage());
             return APIResponse::error(__('update_profile_failed'), 500);
         }
+    }
+
+    public function contact(Request $request)
+    {
+        $fields = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'subject' => 'required|string|max:1000',
+            'phone' => [
+                'nullable',
+                'regex:/^(0|\+84)(3|5|7|8|9)\d{8}$/'
+            ],
+            'type' => 'required|string|in:support,order,feedback,other',
+        ]);
+
+        try {
+            // Import contact to DB and queue email sending
+            $data = [
+                'name' => $fields['name'],
+                'email' => $fields['email'],
+                'subject' => $fields['subject'] ?? null,
+                'phone' => $fields['phone'] ?? null,
+                'type' => $fields['type'],
+            ];
+
+            $contact = $this->authService->createContact($data);
+            if (!$contact) {
+                return APIResponse::error(__('contact_failed'), 500);
+            }
+            return APIResponse::success($contact, __('contact_success'));
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return APIResponse::error(__('contact_failed'), 500);
+        }
+        // For simplicity, we'll just return the data back
     }
 
     public function logout(Request $request)

@@ -37,6 +37,7 @@ Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/all', [ProductController::class, 'indexAll']);
 Route::get('/products/{product}', [ProductController::class, 'show']);
 Route::get('/categories', [CategoryController::class, 'index']);
+Route::post('/contact', [AuthController::class, 'contact']);
 
 // news
 Route::get('/news', [NewController::class, 'index']);
