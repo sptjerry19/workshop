@@ -100,14 +100,14 @@
                 <!-- Map -->
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden">
                     <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.4241677414517!2d106.6987!3d10.7757!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTDCsDQ2JzMyLjUiTiAxMDbCsDQxJzU1LjMiRQ!5e0!3m2!1svi!2s!4v1616150000000!5m2!1svi!2s"
-                        width="100%"
-                        height="300"
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d566.1321761550887!2d106.5603951805528!3d20.55374743756148!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x314a09590fa33c55%3A0xd1ecd7b03a75bbc4!2zdGjhu6d5IDc1!5e0!3m2!1svi!2s!4v1750004231710!5m2!1svi!2s"
+                        width="600"
+                        height="450"
                         style="border: 0"
                         allowfullscreen=""
                         loading="lazy"
-                    >
-                    </iframe>
+                        referrerpolicy="no-referrer-when-downgrade"
+                    ></iframe>
                 </div>
 
                 <!-- Contact Details -->
@@ -141,7 +141,7 @@
                                     Địa chỉ
                                 </h3>
                                 <p class="mt-1 text-gray-600">
-                                    123 Đường ABC, Quận XYZ, TP. Hồ Chí Minh
+                                    74 Quách Hữu Nghiêm
                                 </p>
                             </div>
                         </div>
@@ -163,9 +163,7 @@
                                 <h3 class="text-lg font-medium text-gray-900">
                                     Điện thoại
                                 </h3>
-                                <p class="mt-1 text-gray-600">
-                                    (028) 1234 5678
-                                </p>
+                                <p class="mt-1 text-gray-600">0866612543</p>
                             </div>
                         </div>
                         <div class="flex items-start">
@@ -187,7 +185,7 @@
                                     Email
                                 </h3>
                                 <p class="mt-1 text-gray-600">
-                                    info@example.com
+                                    duylinhvnu@gmail.com
                                 </p>
                             </div>
                         </div>

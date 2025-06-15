@@ -256,14 +256,7 @@
                         ></textarea>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700"
-                            >Content</label
-                        >
-                        <textarea
-                            v-model="form.content"
-                            rows="10"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        ></textarea>
+                        <TinyEditor v-model="form.content" label="Content" />
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700"
@@ -282,6 +275,13 @@
                         <label class="block text-sm font-medium text-gray-700"
                             >Featured Image</label
                         >
+                        <div v-if="form.image" class="mb-2">
+                            <img
+                                :src="form.image"
+                                alt="Current image"
+                                class="h-32 w-32 object-cover rounded"
+                            />
+                        </div>
                         <input
                             type="file"
                             @change="handleImageUpload"
@@ -314,6 +314,7 @@
 import { ref, onMounted } from "vue";
 import AdminLayout from "@/layouts/AdminLayout.vue";
 import axios from "axios";
+import TinyEditor from "../../components/TinyEditor.vue";
 
 const news = ref({
     data: [],
@@ -365,7 +366,10 @@ async function fetchNews() {
 }
 
 function editArticle(article) {
-    form.value = { ...article };
+    form.value = {
+        ...article,
+        image: article.image, // Giữ nguyên URL ảnh hiện tại
+    };
     showEditModal.value = true;
 }
 
@@ -401,7 +405,15 @@ async function submitForm() {
             : "/api/admin/news";
         const method = showEditModal.value ? "put" : "post";
 
-        const response = await axios[method](url, form.value, {
+        // Tạo bản sao của form data để xử lý
+        const formData = { ...form.value };
+
+        // Nếu đang edit và không có file ảnh mới được chọn, giữ nguyên URL ảnh cũ
+        if (showEditModal.value && !formData.image.startsWith("data:")) {
+            formData.image = null; // đẩy lên null
+        }
+
+        const response = await axios[method](url, formData, {
             headers: {
                 "Content-Type": "application/json",
                 Accept: "application/json",

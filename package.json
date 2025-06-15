@@ -20,11 +20,13 @@
     "dependencies": {
         "@inertiajs/inertia-vue3": "^0.6.0",
         "@inertiajs/vue3": "^2.0.9",
+        "@tinymce/tinymce-vue": "^5.1.1",
         "firebase": "^11.8.1",
         "laravel-echo": "^2.1.4",
         "lodash": "^4.17.21",
         "pusher-js": "^8.4.0",
         "swiper": "^11.2.7",
+        "tinymce": "^7.9.1",
         "vue": "^3.5.14",
         "vue-router": "^4.5.1"
     }

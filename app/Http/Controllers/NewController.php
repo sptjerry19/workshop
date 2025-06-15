@@ -92,20 +92,27 @@ class NewController extends Controller
             'summary' => 'required|string',
             'content' => 'required|string',
             'status' => 'required|in:draft,published',
-            'image' => 'required|string' // base64 image
+            'image' => 'nullable|string' // base64 image
         ]);
 
         try {
+            $data = [
+                'title' => $validated['title'],
+                'summary' => $validated['summary'],
+                'content' => $validated['content'],
+                'status' => $validated['status'],
+            ];
+
             // Handle base64 image using Common helper
-            if (isset($validated['image'])) {
+            if (isset($validated['image']) && !is_null($validated['image'])) {
                 // Delete old image if exists
                 if ($news->image) {
                     Storage::disk('public')->delete($news->image);
                 }
-                $validated['image'] = Common::storeBase64Image($validated['image'], 'news');
+                $data['image'] = Common::storeBase64Image($validated['image'], 'news');
             }
 
-            $news->update($validated);
+            $news->update($data);
 
             Log::info('News updated successfully', [
                 'news_id' => $news->id,
