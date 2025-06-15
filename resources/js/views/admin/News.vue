@@ -357,7 +357,7 @@ async function fetchNews() {
             `/api/admin/news?${params.toString()}`
         );
         if (response.data.success) {
-            news.value = response.data.data;
+            news.value = response.data;
         }
     } catch (error) {
         console.error("Failed to fetch news:", error);
@@ -382,27 +382,29 @@ async function deleteArticle(id) {
     }
 }
 
-function handleImageUpload(event) {
-    form.value.image = event.target.files[0];
+async function handleImageUpload(event) {
+    const file = event.target.files[0];
+    if (file) {
+        // Convert image to base64
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            form.value.image = e.target.result; // This will be the base64 string
+        };
+        reader.readAsDataURL(file);
+    }
 }
 
 async function submitForm() {
     try {
-        const formData = new FormData();
-        Object.keys(form.value).forEach((key) => {
-            if (form.value[key] !== null) {
-                formData.append(key, form.value[key]);
-            }
-        });
-
         const url = showEditModal.value
             ? `/api/admin/news/${form.value.id}`
             : "/api/admin/news";
         const method = showEditModal.value ? "put" : "post";
 
-        const response = await axios[method](url, formData, {
+        const response = await axios[method](url, form.value, {
             headers: {
-                "Content-Type": "multipart/form-data",
+                "Content-Type": "application/json",
+                Accept: "application/json",
             },
         });
 
