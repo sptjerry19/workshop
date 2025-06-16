@@ -22,14 +22,19 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'image' => 'required|string',
-            'price' => 'required|numeric|min:0',
+            'name' => ['sometimes', 'required', 'string', 'max:255'],
+            'description' => ['sometimes', 'required', 'string'],
+            'price' => ['sometimes', 'required', 'numeric', 'min:0'],
+            'image' => ['sometimes', 'string'],
+            'category_id' => ['sometimes', 'required', 'exists:categories,id'],
+            'is_active' => ['sometimes', 'boolean'],
+            'options' => ['sometimes', 'array'],
+            'options.*' => ['exists:options,id'],
+            'toppings' => ['sometimes', 'array'],
+            'toppings.*' => ['exists:toppings,id'],
             'size' => 'nullable|array',
             'size.*.label' => 'required|string',
             'size.*.price' => 'required|numeric|min:0',
-            'description' => 'required|string',
-            'category_id' => 'required|exists:categories,id',
             'stock' => 'required|integer|min:0',
             'discount' => 'nullable|numeric|min:0'
         ];

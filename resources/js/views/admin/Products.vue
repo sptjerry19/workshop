@@ -108,6 +108,16 @@
                             <th
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                             >
+                                Options
+                            </th>
+                            <th
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
+                                Toppings
+                            </th>
+                            <th
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >
                                 Actions
                             </th>
                         </tr>
@@ -151,6 +161,40 @@
                                 >
                                     {{ product.status }}
                                 </span>
+                            </td>
+                            <td
+                                class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                            >
+                                <div class="flex flex-wrap gap-1">
+                                    <span
+                                        v-for="option in product.options"
+                                        :key="option.id"
+                                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800"
+                                    >
+                                        {{ option.name }}
+                                        <span class="ml-1 text-gray-500"
+                                            >({{ option.type }})</span
+                                        >
+                                    </span>
+                                </div>
+                            </td>
+                            <td
+                                class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                            >
+                                <div class="flex flex-wrap gap-1">
+                                    <span
+                                        v-for="topping in product.toppings"
+                                        :key="topping.id"
+                                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800"
+                                    >
+                                        {{ topping.name }}
+                                        <span class="ml-1 text-gray-500"
+                                            >({{
+                                                formatPrice(topping.price)
+                                            }})</span
+                                        >
+                                    </span>
+                                </div>
                             </td>
                             <td
                                 class="px-6 py-4 whitespace-nowrap text-sm font-medium"
@@ -258,232 +302,419 @@
         <!-- Create/Edit Product Modal -->
         <div
             v-if="showCreateModal || showEditModal"
-            class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+            class="fixed inset-0 z-50 overflow-y-auto"
         >
-            <div class="bg-white rounded-lg max-w-2xl w-full p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-medium">
-                        {{ showEditModal ? "Edit Product" : "Create Product" }}
-                    </h3>
-                    <button
-                        @click="closeModal"
-                        class="text-gray-400 hover:text-gray-500"
-                    >
-                        <span class="sr-only">Close</span>
-                        <svg
-                            class="h-6 w-6"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12"
-                            />
-                        </svg>
-                    </button>
-                </div>
-                <form @submit.prevent="submitForm" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700"
-                            >Name</label
-                        >
-                        <input
-                            type="text"
-                            v-model="form.name"
-                            required
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        />
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700"
-                            >Description</label
-                        >
-                        <textarea
-                            v-model="form.description"
-                            rows="3"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        ></textarea>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700"
-                            >Category</label
-                        >
-                        <select
-                            v-model="form.category_id"
-                            required
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        >
-                            <option
-                                v-for="category in categories"
-                                :key="category.id"
-                                :value="category.id"
-                            >
-                                {{ category.name }}
-                            </option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700"
-                            >Sizes</label
-                        >
-                        <div class="space-y-2">
-                            <div
-                                v-for="(s, index) in form.size"
-                                :key="index"
-                                class="flex items-center space-x-2"
-                            >
-                                <input
-                                    type="text"
-                                    v-model="s.label"
-                                    placeholder="Label"
-                                    class="w-1/2 rounded-md border-gray-300 shadow-sm"
-                                />
-                                <input
-                                    type="number"
-                                    v-model="s.price"
-                                    placeholder="Price"
-                                    min="0"
-                                    step="1000"
-                                    class="w-1/2 rounded-md border-gray-300 shadow-sm"
-                                />
-                                <button
-                                    type="button"
-                                    @click="removeSize(index)"
-                                    class="text-red-500 hover:text-red-700"
-                                >
-                                    ✕
-                                </button>
-                            </div>
-                        </div>
+            <div class="flex min-h-screen items-center justify-center p-4">
+                <div
+                    class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+                ></div>
+                <div
+                    class="relative w-full max-w-4xl transform overflow-hidden rounded-lg bg-white p-6 shadow-xl transition-all"
+                >
+                    <div class="absolute right-0 top-0 pr-4 pt-4">
                         <button
-                            type="button"
-                            @click="addSize"
-                            class="mt-2 text-blue-500 hover:underline"
+                            @click="closeModal"
+                            class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none"
                         >
-                            + Thêm size
+                            <span class="sr-only">Close</span>
+                            <svg
+                                class="h-6 w-6"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="1.5"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M6 18L18 6M6 6l12 12"
+                                />
+                            </svg>
                         </button>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label
-                                class="block text-sm font-medium text-gray-700"
-                                >Base Price</label
-                            >
-                            <input
-                                v-model.number="form.price"
-                                type="number"
-                                required
-                                min="0"
-                                step="0.01"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                class="block text-sm font-medium text-gray-700"
-                                >Stock</label
-                            >
-                            <input
-                                v-model.number="form.stock"
-                                type="number"
-                                required
-                                min="0"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                            />
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-3 gap-4">
-                        <div>
-                            <label
-                                class="block text-sm font-medium text-gray-700"
-                                >Sold</label
-                            >
-                            <input
-                                v-model.number="form.sold"
-                                type="number"
-                                min="0"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                class="block text-sm font-medium text-gray-700"
-                                >Rating</label
-                            >
-                            <input
-                                v-model.number="form.rating"
-                                type="number"
-                                min="0"
-                                step="0.1"
-                                max="5"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                class="block text-sm font-medium text-gray-700"
-                                >Reviews</label
-                            >
-                            <input
-                                v-model.number="form.reviews"
-                                type="number"
-                                min="0"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                            />
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700"
-                            >Discount (%) or Price</label
+                    <div class="max-h-[calc(100vh-8rem)] overflow-y-auto pr-2">
+                        <h3
+                            class="text-lg font-medium leading-6 text-gray-900 mb-4"
                         >
-                        <input
-                            v-model.number="form.discount"
-                            type="number"
-                            min="0"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        />
+                            {{
+                                showEditModal
+                                    ? "Edit Product"
+                                    : "Add New Product"
+                            }}
+                        </h3>
+
+                        <form @submit.prevent="submitForm" class="space-y-4">
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700"
+                                >
+                                    Name <span class="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    v-model="form.name"
+                                    :class="{ 'border-red-500': errors.name }"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
+                                <p
+                                    v-if="errors.name"
+                                    class="mt-1 text-sm text-red-500"
+                                >
+                                    {{ errors.name }}
+                                </p>
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700"
+                                >
+                                    Description
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <textarea
+                                    v-model="form.description"
+                                    :class="{
+                                        'border-red-500': errors.description,
+                                    }"
+                                    rows="3"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                ></textarea>
+                                <p
+                                    v-if="errors.description"
+                                    class="mt-1 text-sm text-red-500"
+                                >
+                                    {{ errors.description }}
+                                </p>
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700"
+                                >
+                                    Category <span class="text-red-500">*</span>
+                                </label>
+                                <select
+                                    v-model="form.category_id"
+                                    :class="{
+                                        'border-red-500': errors.category_id,
+                                    }"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                >
+                                    <option value="">Select a category</option>
+                                    <option
+                                        v-for="category in categories"
+                                        :key="category.id"
+                                        :value="category.id"
+                                    >
+                                        {{ category.name }}
+                                    </option>
+                                </select>
+                                <p
+                                    v-if="errors.category_id"
+                                    class="mt-1 text-sm text-red-500"
+                                >
+                                    {{ errors.category_id }}
+                                </p>
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700"
+                                    >Sizes</label
+                                >
+                                <div class="space-y-2">
+                                    <div
+                                        v-for="(s, index) in form.size"
+                                        :key="index"
+                                        class="flex items-center space-x-2"
+                                    >
+                                        <div class="w-1/2">
+                                            <input
+                                                type="text"
+                                                v-model="s.label"
+                                                placeholder="Label"
+                                                :class="{
+                                                    'border-red-500':
+                                                        errors[
+                                                            `size.${index}.label`
+                                                        ],
+                                                }"
+                                                class="w-full rounded-md border-gray-300 shadow-sm"
+                                            />
+                                            <p
+                                                v-if="
+                                                    errors[
+                                                        `size.${index}.label`
+                                                    ]
+                                                "
+                                                class="mt-1 text-sm text-red-500"
+                                            >
+                                                {{
+                                                    errors[
+                                                        `size.${index}.label`
+                                                    ]
+                                                }}
+                                            </p>
+                                        </div>
+                                        <div class="w-1/2">
+                                            <input
+                                                type="number"
+                                                v-model="s.price"
+                                                placeholder="Price"
+                                                min="0"
+                                                step="1000"
+                                                :class="{
+                                                    'border-red-500':
+                                                        errors[
+                                                            `size.${index}.price`
+                                                        ],
+                                                }"
+                                                class="w-full rounded-md border-gray-300 shadow-sm"
+                                            />
+                                            <p
+                                                v-if="
+                                                    errors[
+                                                        `size.${index}.price`
+                                                    ]
+                                                "
+                                                class="mt-1 text-sm text-red-500"
+                                            >
+                                                {{
+                                                    errors[
+                                                        `size.${index}.price`
+                                                    ]
+                                                }}
+                                            </p>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            @click="removeSize(index)"
+                                            class="text-red-500 hover:text-red-700"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    @click="addSize"
+                                    class="mt-2 text-blue-500 hover:underline"
+                                >
+                                    + Add size
+                                </button>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label
+                                        class="block text-sm font-medium text-gray-700"
+                                    >
+                                        Base Price
+                                        <span class="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        v-model.number="form.price"
+                                        type="number"
+                                        min="0"
+                                        step="0.01"
+                                        :class="{
+                                            'border-red-500': errors.price,
+                                        }"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    />
+                                    <p
+                                        v-if="errors.price"
+                                        class="mt-1 text-sm text-red-500"
+                                    >
+                                        {{ errors.price }}
+                                    </p>
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-sm font-medium text-gray-700"
+                                    >
+                                        Stock
+                                    </label>
+                                    <input
+                                        v-model.number="form.stock"
+                                        type="number"
+                                        min="0"
+                                        :class="{
+                                            'border-red-500': errors.stock,
+                                        }"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    />
+                                    <p
+                                        v-if="errors.stock"
+                                        class="mt-1 text-sm text-red-500"
+                                    >
+                                        {{ errors.stock }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-3 gap-4">
+                                <div>
+                                    <label
+                                        class="block text-sm font-medium text-gray-700"
+                                        >Sold</label
+                                    >
+                                    <input
+                                        v-model.number="form.sold"
+                                        type="number"
+                                        min="0"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    />
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-sm font-medium text-gray-700"
+                                        >Rating</label
+                                    >
+                                    <input
+                                        v-model.number="form.rating"
+                                        type="number"
+                                        min="0"
+                                        step="0.1"
+                                        max="5"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    />
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-sm font-medium text-gray-700"
+                                        >Reviews</label
+                                    >
+                                    <input
+                                        v-model.number="form.reviews"
+                                        type="number"
+                                        min="0"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700"
+                                    >Discount (%)</label
+                                >
+                                <input
+                                    v-model.number="form.discount"
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700"
+                                >
+                                    Image <span class="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    @change="handleImageUpload"
+                                    :class="{ 'border-red-500': errors.image }"
+                                    class="mt-1 block w-full"
+                                />
+                                <p
+                                    v-if="errors.image"
+                                    class="mt-1 text-sm text-red-500"
+                                >
+                                    {{ errors.image }}
+                                </p>
+                                <div v-if="form.image" class="mt-2">
+                                    <img
+                                        :src="form.image"
+                                        class="h-24 w-24 object-cover rounded"
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700"
+                                    >Options</label
+                                >
+                                <div class="space-y-2">
+                                    <div
+                                        v-for="option in options"
+                                        :key="option.id"
+                                        class="flex items-center space-x-2"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            :id="'option-' + option.id"
+                                            v-model="form.options"
+                                            :value="option.id"
+                                            class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                        />
+                                        <label
+                                            :for="'option-' + option.id"
+                                            class="text-sm text-gray-700"
+                                        >
+                                            {{ option.name }}
+                                            <span class="text-xs text-gray-500"
+                                                >({{ option.type }})</span
+                                            >
+                                            <span
+                                                v-if="option.is_required"
+                                                class="text-xs text-red-500"
+                                                >*</span
+                                            >
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700"
+                                    >Toppings</label
+                                >
+                                <div class="space-y-2">
+                                    <div
+                                        v-for="topping in toppings"
+                                        :key="topping.id"
+                                        class="flex items-center space-x-2"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            :id="'topping-' + topping.id"
+                                            v-model="form.toppings"
+                                            :value="topping.id"
+                                            class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                        />
+                                        <label
+                                            :for="'topping-' + topping.id"
+                                            class="text-sm text-gray-700"
+                                        >
+                                            {{ topping.name }}
+                                            <span class="text-xs text-gray-500"
+                                                >({{
+                                                    formatPrice(topping.price)
+                                                }})</span
+                                            >
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                     </div>
 
-                    <!-- Image upload with base64 preview -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700"
-                            >Image</label
-                        >
-                        <input
-                            type="file"
-                            accept="image/*"
-                            @change="handleImageUpload"
-                            class="mt-1 block w-full"
-                        />
-                        <div v-if="form.image" class="mt-2">
-                            <img
-                                :src="form.image"
-                                class="h-24 w-24 object-cover rounded"
-                            />
-                        </div>
-                    </div>
-                    <div class="flex justify-end space-x-3">
+                    <div class="mt-6 flex justify-end space-x-3">
                         <button
                             type="button"
                             @click="closeModal"
-                            class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300"
+                            class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
-                            class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                            @click="submitForm"
+                            class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                         >
                             {{ showEditModal ? "Update" : "Create" }}
                         </button>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     </AdminLayout>
@@ -513,6 +744,8 @@ const filters = ref({
 
 const showCreateModal = ref(false);
 const showEditModal = ref(false);
+const options = ref([]);
+const toppings = ref([]);
 
 const getDefaultForm = () => ({
     name: "",
@@ -530,7 +763,10 @@ const getDefaultForm = () => ({
     category_id: "",
     stock: 0,
     discount: null,
+    options: [],
+    toppings: [],
 });
+
 const form = ref(getDefaultForm());
 
 const pages = computed(() => {
@@ -568,9 +804,61 @@ const removeSize = (index) => {
     form.value.size.splice(index, 1);
 };
 
+// Add validation state
+const errors = ref({});
+
+// Add validation function
+const validateForm = () => {
+    errors.value = {};
+    let isValid = true;
+
+    if (!form.value.name) {
+        errors.value.name = "Name is required";
+        isValid = false;
+    }
+
+    if (!form.value.description) {
+        errors.value.description = "Description is required";
+        isValid = false;
+    }
+
+    if (!form.value.price || form.value.price < 0) {
+        errors.value.price = "Price must be greater than 0";
+        isValid = false;
+    }
+
+    if (!form.value.category_id) {
+        errors.value.category_id = "Category is required";
+        isValid = false;
+    }
+
+    if (!form.value.image) {
+        errors.value.image = "Image is required";
+        isValid = false;
+    }
+
+    if (form.value.size && form.value.size.length > 0) {
+        form.value.size.forEach((size, index) => {
+            if (!size.label) {
+                errors.value[`size.${index}.label`] = "Size label is required";
+                isValid = false;
+            }
+            if (!size.price || size.price < 0) {
+                errors.value[`size.${index}.price`] =
+                    "Size price must be greater than 0";
+                isValid = false;
+            }
+        });
+    }
+
+    return isValid;
+};
+
 onMounted(() => {
     fetchProducts();
     fetchCategories();
+    fetchOptions();
+    fetchToppings();
 });
 
 async function fetchProducts() {
@@ -606,8 +894,50 @@ async function fetchCategories() {
     }
 }
 
+async function fetchOptions() {
+    try {
+        const response = await axios.get("/api/options");
+        if (response.data.success) {
+            options.value = response.data.data;
+        }
+    } catch (error) {
+        console.error("Failed to fetch options:", error);
+    }
+}
+
+async function fetchToppings() {
+    try {
+        const response = await axios.get("/api/toppings");
+        if (response.data.success) {
+            toppings.value = response.data.data;
+        }
+    } catch (error) {
+        console.error("Failed to fetch toppings:", error);
+    }
+}
+
 function editProduct(product) {
-    form.value = { ...product };
+    // Create a new form object with all product data
+    const formData = {
+        id: product.id,
+        name: product.name,
+        image: product.image,
+        price: product.price,
+        size: product.size,
+        sold: product.sold,
+        rating: product.rating,
+        reviews: product.reviews,
+        description: product.description,
+        category_id: product.category_id,
+        stock: product.stock,
+        discount: product.discount,
+        // Map options and toppings to their IDs
+        options: product.options.map((option) => option.id),
+        toppings: product.toppings.map((topping) => topping.id),
+    };
+
+    // Update the form with the new data
+    form.value = formData;
     showEditModal.value = true;
 }
 
@@ -636,13 +966,17 @@ const handleImageUpload = (event) => {
 };
 
 async function submitForm() {
+    if (!validateForm()) {
+        return;
+    }
+
     try {
         const url = showEditModal.value
             ? `/api/admin/products/${form.value.id}`
             : "/api/admin/products";
         const method = showEditModal.value ? "put" : "post";
 
-        const response = await axios[method](url, form.value); // Gửi raw JSON
+        const response = await axios[method](url, form.value);
 
         if (response.data.success) {
             form.value = getDefaultForm();
@@ -650,6 +984,9 @@ async function submitForm() {
             fetchProducts();
         }
     } catch (error) {
+        if (error.response?.data?.errors) {
+            errors.value = error.response.data.errors;
+        }
         console.error("Failed to submit form:", error.response?.data || error);
     }
 }
@@ -690,3 +1027,38 @@ function getStatusBadgeClass(status) {
     };
 }
 </script>
+
+<style scoped>
+/* Add custom scrollbar styles */
+.max-h-\[calc\(100vh-8rem\)\] {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e0 #edf2f7;
+}
+
+.max-h-\[calc\(100vh-8rem\)\]::-webkit-scrollbar {
+    width: 6px;
+}
+
+.max-h-\[calc\(100vh-8rem\)\]::-webkit-scrollbar-track {
+    background: #edf2f7;
+    border-radius: 3px;
+}
+
+.max-h-\[calc\(100vh-8rem\)\]::-webkit-scrollbar-thumb {
+    background-color: #cbd5e0;
+    border-radius: 3px;
+}
+
+/* Responsive grid adjustments */
+@media (max-width: 640px) {
+    .grid-cols-3 {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+    .grid-cols-3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+</style>

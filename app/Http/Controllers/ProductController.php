@@ -64,37 +64,33 @@ class ProductController extends Controller
     {
         $fields = $request->validated();
 
+        // Extract options and toppings from the request
+        $options = $fields['options'] ?? [];
+        $toppings = $fields['toppings'] ?? [];
+        unset($fields['options'], $fields['toppings']);
+
         $product = $this->productService->createProduct($fields);
         if (!$product) {
             return ApiResponse::error('Failed to create product', 500);
         }
 
-        // Log before broadcasting
-        Log::info('Broadcasting ProductUpdated event', [
-            'product_id' => $product->id,
-            'product_name' => $product->name,
-            'broadcast_driver' => config('broadcasting.default'),
-            'pusher_app_id' => config('broadcasting.connections.pusher.app_id'),
-            'pusher_app_key' => config('broadcasting.connections.pusher.key'),
-            'pusher_app_cluster' => config('broadcasting.connections.pusher.options.cluster')
-        ]);
+        // Attach options and toppings
+        if (!empty($options)) {
+            $product->options()->attach($options);
+        }
+        if (!empty($toppings)) {
+            $product->toppings()->attach($toppings);
+        }
+
+        // Load relationships for response
+        $product->load(['options.values', 'toppings']);
 
         try {
-            // Broadcast the event
             broadcast(new ProductUpdated($product));
-
-            // Log after broadcasting
-            Log::info('ProductUpdated event broadcasted successfully', [
-                'product_id' => $product->id,
-                'product_name' => $product->name,
-                'channel' => 'products',
-                'event' => 'ProductUpdated'
-            ]);
         } catch (\Exception $e) {
             Log::error('Failed to broadcast ProductUpdated event', [
                 'error' => $e->getMessage(),
-                'product_id' => $product->id,
-                'trace' => $e->getTraceAsString()
+                'product_id' => $product->id
             ]);
         }
 
@@ -113,6 +109,12 @@ class ProductController extends Controller
     public function update(UpdateRequest $request, string $id)
     {
         $fields = $request->validated();
+
+        // Extract options and toppings from the request
+        $options = $fields['options'] ?? [];
+        $toppings = $fields['toppings'] ?? [];
+        unset($fields['options'], $fields['toppings']);
+
         $product = $this->productService->getProductById($id);
         if (!$product) {
             return ApiResponse::error('Product not found', 404);
@@ -120,22 +122,19 @@ class ProductController extends Controller
 
         $updatedProduct = $this->productService->updateProduct($product, $fields);
 
-        // Log before broadcasting
-        Log::info('Broadcasting ProductUpdated event', [
-            'product_id' => $updatedProduct->id,
-            'product_name' => $updatedProduct->name,
-            'broadcast_driver' => config('broadcasting.default')
-        ]);
+        // Sync options and toppings
+        if (isset($options)) {
+            $updatedProduct->options()->sync($options);
+        }
+        if (isset($toppings)) {
+            $updatedProduct->toppings()->sync($toppings);
+        }
+
+        // Load relationships for response
+        $updatedProduct->load(['options.values', 'toppings']);
 
         try {
-            // Broadcast the event
             broadcast(new ProductUpdated($updatedProduct))->toOthers();
-
-            // Log after broadcasting
-            Log::info('ProductUpdated event broadcasted successfully', [
-                'product_id' => $updatedProduct->id,
-                'product_name' => $updatedProduct->name
-            ]);
         } catch (\Exception $e) {
             Log::error('Failed to broadcast ProductUpdated event', [
                 'error' => $e->getMessage(),

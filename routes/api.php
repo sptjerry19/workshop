@@ -15,6 +15,8 @@ use App\Http\Controllers\NewsController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NewController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\OptionController;
+use App\Http\Controllers\ToppingController;
 
 Route::get('/', function () {
     return 'OK';
@@ -152,3 +154,9 @@ Route::get('/messages', [MessageController::class, 'index']);
 Route::get('/messages/users', [MessageController::class, 'getUsers']);
 Route::post('/messages', [MessageController::class, 'store']);
 Route::post('/messages/{from_sender_id}/reply', [MessageController::class, 'adminReply'])->middleware('jwt.auth');
+
+// Options routes
+Route::get('/options', [OptionController::class, 'index']);
+
+// Toppings routes
+Route::get('/toppings', [ToppingController::class, 'index']);

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Helpers\Common;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Product extends Model
 {
@@ -65,11 +66,44 @@ class Product extends Model
             'stock' => $this->stock,
             'discount' => $this->discount,
             'is_favorite' => $isFavorite,
+            'options' => $this->options->map(function ($option) {
+                return [
+                    'id' => $option->id,
+                    'name' => $option->name,
+                    'type' => $option->type,
+                    'is_required' => $option->is_required,
+                    'values' => $option->values->map(function ($value) {
+                        return [
+                            'id' => $value->id,
+                            'value' => $value->value,
+                            'price' => $value->price
+                        ];
+                    })
+                ];
+            }),
+            'toppings' => $this->toppings->map(function ($topping) {
+                return [
+                    'id' => $topping->id,
+                    'name' => $topping->name,
+                    'price' => $topping->price
+                ];
+            })
         ];
     }
 
     public function wishlists()
     {
         return $this->hasMany(Wishlist::class);
+    }
+
+    public function options(): BelongsToMany
+    {
+        return $this->belongsToMany(Option::class, 'product_options')
+            ->with('values');
+    }
+
+    public function toppings(): BelongsToMany
+    {
+        return $this->belongsToMany(Topping::class, 'product_toppings');
     }
 }
