@@ -223,8 +223,9 @@
 </template>
 
 <script>
-import { ref, computed } from "vue";
-import axios from "axios";
+import { ref, computed, onMounted, watch } from "vue";
+import { useRouter } from "vue-router";
+import api from "@/api";
 
 export default {
     name: "Cart",
@@ -260,7 +261,7 @@ export default {
 
         const fetchCart = async () => {
             try {
-                const response = await axios.get("/api/cart");
+                const response = await api.get("/cart");
                 cartItems.value = response.data;
             } catch (error) {
                 console.error("Error fetching cart:", error);
@@ -270,7 +271,7 @@ export default {
         const updateQuantity = async (item, quantity) => {
             if (quantity < 1) return;
             try {
-                await axios.put(`/api/cart/${item.id}`, { quantity });
+                await api.put(`/cart/${item.id}`, { quantity });
                 item.quantity = quantity;
             } catch (error) {
                 console.error("Error updating quantity:", error);
@@ -279,7 +280,7 @@ export default {
 
         const removeItem = async (item) => {
             try {
-                await axios.delete(`/api/cart/${item.id}`);
+                await api.delete(`/cart/${item.id}`);
                 cartItems.value = cartItems.value.filter(
                     (i) => i.id !== item.id
                 );
@@ -292,18 +293,15 @@ export default {
             if (selectedPaymentMethod.value === "momo") {
                 try {
                     isProcessing.value = true;
-                    const response = await axios.post(
-                        "/api/payment/momo/create",
-                        {
-                            amount: total.value,
-                            description: `Thanh toan don hang #${Date.now()}`,
-                        }
-                    );
+                    const response = await api.post("/payment/momo/create", {
+                        amount: total.value,
+                        description: `Thanh toan don hang #${Date.now()}`,
+                    });
 
                     if (response.data.success) {
                         currentPaymentId.value = response.data.payment.id;
-                        const qrResponse = await axios.get(
-                            `/api/payment/momo/${currentPaymentId.value}/qr`
+                        const qrResponse = await api.get(
+                            `/payment/momo/${currentPaymentId.value}/qr`
                         );
                         if (qrResponse.data.success) {
                             qrCodeUrl.value = qrResponse.data.qrCodeUrl;
@@ -338,8 +336,8 @@ export default {
             if (!currentPaymentId.value) return;
 
             try {
-                const response = await axios.get(
-                    `/api/payment/momo/${currentPaymentId.value}/status`
+                const response = await api.get(
+                    `/payment/momo/${currentPaymentId.value}/status`
                 );
                 if (
                     response.data.success &&

@@ -72,12 +72,14 @@
             <p class="text-red-600">Không tìm thấy bài viết</p>
         </div>
     </div>
+    <ChatBox />
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import Banner from "../components/Banner.vue";
+import ChatBox from "../components/ChatBox.vue";
 import api from "../api.js";
 
 const route = useRoute();

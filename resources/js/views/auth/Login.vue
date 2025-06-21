@@ -88,9 +88,9 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
+import api from "@/api";
 
 export default {
     name: "Login",
@@ -105,7 +105,7 @@ export default {
         const handleLogin = async () => {
             loading.value = true;
             try {
-                const response = await axios.post("/api/login", form.value);
+                const response = await api.post("/login", form.value);
                 document.cookie = `token=${response.data.token}; path=/; max-age=86400`;
                 // Lưu thông tin user vào cookie
                 const userStr = JSON.stringify(response.data.user);

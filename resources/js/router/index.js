@@ -9,6 +9,7 @@ import News from "../views/News.vue";
 import NewsDetail from "../views/NewsDetail.vue";
 import Contact from "../views/Contact.vue";
 import Cart from "../views/Cart.vue";
+import Story from "../views/Story.vue";
 import ProductsAdmin from "../views/admin/Products.vue";
 import NewsAdmin from "../views/admin/News.vue";
 import OrdersAdmin from "../views/admin/Orders.vue";
@@ -51,6 +52,11 @@ const routes = [
         path: "/about",
         name: "about",
         component: About,
+    },
+    {
+        path: "/story",
+        name: "story",
+        component: Story,
     },
     {
         path: "/products",

@@ -185,7 +185,7 @@
 import { ref, onMounted } from "vue";
 import AdminLayout from "@/layouts/AdminLayout.vue";
 import AdminChatBox from "../../components/AdminChatBox.vue";
-import axios from "axios";
+import api from "@/api";
 
 const stats = ref({
     total_orders: 0,
@@ -198,7 +198,7 @@ const stats = ref({
 
 onMounted(async () => {
     try {
-        const response = await axios.get("/api/admin/dashboard");
+        const response = await api.get("/admin/dashboard");
         if (response.data.success) {
             stats.value = response.data.data;
         }

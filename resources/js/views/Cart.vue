@@ -313,12 +313,14 @@
             </div>
         </div>
     </div>
+    <ChatBox />
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import Banner from "../components/Banner.vue";
 import OrderHistory from "../components/OrderHistory.vue";
+import ChatBox from "../components/ChatBox.vue";
 import axios from "axios";
 
 const cartItems = ref([]);

@@ -318,9 +318,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import AdminLayout from "@/layouts/AdminLayout.vue";
-import axios from "axios";
+import api from "@/api";
 
 const users = ref({
     data: [],
@@ -360,9 +360,7 @@ async function fetchUsers() {
         if (users.value.current_page > 1)
             params.append("page", users.value.current_page);
 
-        const response = await axios.get(
-            `/api/admin/users?${params.toString()}`
-        );
+        const response = await api.get(`/admin/users?${params.toString()}`);
         if (response.data.success) {
             users.value = response.data.data;
         }
@@ -380,7 +378,7 @@ async function deleteUser(id) {
     if (!confirm("Are you sure you want to delete this user?")) return;
 
     try {
-        const response = await axios.delete(`/api/admin/users/${id}`);
+        const response = await api.delete(`/admin/users/${id}`);
         if (response.data.success) {
             fetchUsers();
         }
@@ -392,11 +390,11 @@ async function deleteUser(id) {
 async function submitForm() {
     try {
         const url = showEditModal.value
-            ? `/api/admin/users/${form.value.id}`
-            : "/api/admin/users";
+            ? `/admin/users/${form.value.id}`
+            : "/admin/users";
         const method = showEditModal.value ? "put" : "post";
 
-        const response = await axios[method](url, form.value);
+        const response = await api[method](url, form.value);
         if (response.data.success) {
             closeModal();
             fetchUsers();

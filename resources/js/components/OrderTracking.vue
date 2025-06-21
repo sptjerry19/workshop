@@ -13,7 +13,9 @@
             <!-- Order Header -->
             <div class="flex justify-between items-start mb-6">
                 <div>
-                    <h2 class="text-2xl font-bold">Đơn hàng #{{ order.id }}</h2>
+                    <h2 class="text-2xl font-bold">
+                        Đơn hàng #{{ order.order_number }}
+                    </h2>
                     <p class="text-gray-500">
                         {{ formatDate(order.created_at) }}
                     </p>
@@ -28,6 +30,21 @@
                     <p class="text-lg font-bold text-[#d80000] mt-2">
                         {{ formatPrice(order.total_amount) }}
                     </p>
+                </div>
+            </div>
+
+            <!-- Customer Information -->
+            <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                <h3 class="text-lg font-semibold mb-3">Thông tin khách hàng</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-gray-600 text-sm">Tên khách hàng:</p>
+                        <p class="font-medium">{{ order.customer_name }}</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-600 text-sm">Số điện thoại:</p>
+                        <p class="font-medium">{{ order.customer_phone }}</p>
+                    </div>
                 </div>
             </div>
 
@@ -93,34 +110,136 @@
             <!-- Order Details -->
             <div class="border-t pt-6">
                 <h3 class="text-lg font-semibold mb-4">Chi tiết đơn hàng</h3>
-                <div class="space-y-4">
+                <div class="space-y-6">
                     <div
-                        v-for="item in order.order_items"
-                        :key="item.id"
-                        class="flex items-center gap-4"
+                        v-for="item in order.items"
+                        :key="item.key"
+                        class="border rounded-lg p-4"
                     >
-                        <img
-                            :src="item.product.image"
-                            :alt="item.product.name"
-                            class="w-16 h-16 object-cover rounded"
-                        />
-                        <div class="flex-1">
-                            <h4 class="font-medium">{{ item.product.name }}</h4>
-                            <p class="text-sm text-gray-500">
-                                Số lượng: {{ item.quantity }}
-                            </p>
-                            <p class="text-sm text-gray-500">
-                                {{ formatPrice(item.price) }}
-                            </p>
+                        <div class="flex items-start gap-4">
+                            <img
+                                :src="item.image"
+                                :alt="item.name"
+                                class="w-20 h-20 object-cover rounded"
+                            />
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h4 class="font-medium text-lg">
+                                            {{ item.name }}
+                                        </h4>
+                                        <p class="text-sm text-gray-500">
+                                            {{ item.description }}
+                                        </p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-medium">
+                                            {{ formatPrice(item.price) }}
+                                        </p>
+                                        <p class="text-sm text-gray-500">
+                                            x{{ item.quantity }}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Size Information -->
+                                <div v-if="item.size" class="mt-2">
+                                    <span
+                                        class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded"
+                                    >
+                                        Size: {{ item.size.label }} (+{{
+                                            formatPrice(item.size.price)
+                                        }})
+                                    </span>
+                                </div>
+
+                                <!-- Options -->
+                                <div
+                                    v-if="
+                                        item.options && item.options.length > 0
+                                    "
+                                    class="mt-2"
+                                >
+                                    <p
+                                        class="text-sm font-medium text-gray-700 mb-1"
+                                    >
+                                        Tùy chọn:
+                                    </p>
+                                    <div class="flex flex-wrap gap-1">
+                                        <span
+                                            v-for="option in item.options"
+                                            :key="option.id"
+                                            class="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded"
+                                        >
+                                            {{ option.name }}:
+                                            {{ option.value }}
+                                            <span v-if="option.price > 0"
+                                                >(+{{
+                                                    formatPrice(option.price)
+                                                }})</span
+                                            >
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Toppings -->
+                                <div
+                                    v-if="
+                                        item.toppings &&
+                                        item.toppings.length > 0
+                                    "
+                                    class="mt-2"
+                                >
+                                    <p
+                                        class="text-sm font-medium text-gray-700 mb-1"
+                                    >
+                                        Toppings:
+                                    </p>
+                                    <div class="flex flex-wrap gap-1">
+                                        <span
+                                            v-for="topping in item.toppings"
+                                            :key="topping.id"
+                                            class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded"
+                                        >
+                                            {{ topping.name }} (+{{
+                                                formatPrice(topping.price)
+                                            }})
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Discount -->
+                                <div
+                                    v-if="item.discount && item.discount > 0"
+                                    class="mt-2"
+                                >
+                                    <span
+                                        class="inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded"
+                                    >
+                                        Giảm giá:
+                                        {{ formatPrice(item.discount) }}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="border-t pt-6 mt-6">
+                <div class="flex justify-between items-center">
+                    <span class="text-lg font-semibold">Tổng cộng:</span>
+                    <span class="text-xl font-bold text-[#d80000]">{{
+                        formatPrice(order.total_amount)
+                    }}</span>
                 </div>
             </div>
 
             <!-- Payment Information -->
             <div class="border-t pt-6 mt-6">
                 <h3 class="text-lg font-semibold mb-4">Thông tin thanh toán</h3>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <p class="text-gray-600">Phương thức thanh toán:</p>
                         <p class="font-medium">
@@ -145,6 +264,12 @@
                 <p class="text-gray-600">Địa chỉ giao hàng:</p>
                 <p class="font-medium">{{ order.customer_address }}</p>
             </div>
+
+            <!-- Notes -->
+            <div v-if="order.notes" class="border-t pt-6 mt-6">
+                <h3 class="text-lg font-semibold mb-4">Ghi chú</h3>
+                <p class="text-gray-700">{{ order.notes }}</p>
+            </div>
         </div>
 
         <div v-else class="text-center py-8">
@@ -157,7 +282,7 @@
 import Banner from "./Banner.vue";
 import { ref, onMounted, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
-import axios from "axios";
+import api from "@/api";
 
 const route = useRoute();
 const order = ref(null);
@@ -172,7 +297,7 @@ const orderStatuses = [
 
 async function fetchOrderDetails() {
     try {
-        const response = await axios.get(`/api/orders/${route.params.id}`);
+        const response = await api.get(`/orders/${route.params.id}`);
         if (response.data.success) {
             order.value = response.data.data;
         }
@@ -237,7 +362,7 @@ function getPaymentMethodText(method) {
 function getPaymentStatusClass(status) {
     const classes = {
         pending: "text-yellow-600",
-        completed: "text-green-600",
+        paid: "text-green-600",
         failed: "text-red-600",
     };
     return classes[status] || "text-gray-600";
@@ -246,7 +371,7 @@ function getPaymentStatusClass(status) {
 function getPaymentStatusText(status) {
     const texts = {
         pending: "Chờ thanh toán",
-        completed: "Đã thanh toán",
+        paid: "Đã thanh toán",
         failed: "Thanh toán thất bại",
     };
     return texts[status] || status;
@@ -258,6 +383,17 @@ onMounted(() => {
     // Subscribe to order updates using public channel
     window.Echo.channel(`order.${route.params.id}`).listen(
         "OrderStatusUpdated",
+        (e) => {
+            if (order.value) {
+                order.value.order_status = e.order.order_status;
+                order.value.payment_status = e.order.payment_status;
+                order.value.updated_at = e.order.updated_at;
+            }
+        }
+    );
+
+    window.Echo.channel(`order.${route.params.id}`).listen(
+        ".OrderStatusUpdated",
         (e) => {
             if (order.value) {
                 order.value.order_status = e.order.order_status;

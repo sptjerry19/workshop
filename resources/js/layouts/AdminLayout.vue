@@ -174,7 +174,7 @@
 <script setup>
 import { computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import axios from "axios";
+import api from "@/api";
 
 const router = useRouter();
 const route = useRoute();
@@ -186,7 +186,7 @@ const title = computed(() => {
 
 async function logout() {
     try {
-        await axios.post("/api/logout");
+        await api.post("/logout");
         router.push("/login");
     } catch (error) {
         console.error("Logout failed:", error);

@@ -308,12 +308,14 @@
             </div>
         </div>
     </AdminLayout>
+    <AdminChatBox />
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import AdminLayout from "@/layouts/AdminLayout.vue";
-import axios from "axios";
+import AdminChatBox from "../../components/AdminChatBox.vue";
+import api from "@/api";
 import TinyEditor from "../../components/TinyEditor.vue";
 
 const news = ref({
@@ -354,9 +356,7 @@ async function fetchNews() {
         if (news.value.current_page > 1)
             params.append("page", news.value.current_page);
 
-        const response = await axios.get(
-            `/api/admin/news?${params.toString()}`
-        );
+        const response = await api.get(`/admin/news?${params.toString()}`);
         if (response.data.success) {
             news.value = response.data;
         }
@@ -377,7 +377,7 @@ async function deleteArticle(id) {
     if (!confirm("Are you sure you want to delete this article?")) return;
 
     try {
-        const response = await axios.delete(`/api/admin/news/${id}`);
+        const response = await api.delete(`/admin/news/${id}`);
         if (response.data.success) {
             fetchNews();
         }
@@ -401,8 +401,8 @@ async function handleImageUpload(event) {
 async function submitForm() {
     try {
         const url = showEditModal.value
-            ? `/api/admin/news/${form.value.id}`
-            : "/api/admin/news";
+            ? `/admin/news/${form.value.id}`
+            : "/admin/news";
         const method = showEditModal.value ? "put" : "post";
 
         // Tạo bản sao của form data để xử lý
@@ -413,7 +413,7 @@ async function submitForm() {
             formData.image = null; // đẩy lên null
         }
 
-        const response = await axios[method](url, formData, {
+        const response = await api[method](url, formData, {
             headers: {
                 "Content-Type": "application/json",
                 Accept: "application/json",
