@@ -145,7 +145,7 @@ class NewController extends Controller
                 'title' => $news->title
             ]);
 
-            return response()->json(null, 204);
+            return APIResponse::success([], 'News deleted successfully', 200);
         } catch (\Exception $e) {
             Log::error('Failed to delete news', [
                 'error' => $e->getMessage(),

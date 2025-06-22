@@ -208,7 +208,9 @@
             v-if="showCreateModal || showEditModal"
             class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
         >
-            <div class="bg-white rounded-lg max-w-4xl w-full p-6">
+            <div
+                class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6"
+            >
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-medium">
                         {{ showEditModal ? "Edit Article" : "Create Article" }}
