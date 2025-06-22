@@ -15,6 +15,8 @@ import NewsAdmin from "../views/admin/News.vue";
 import OrdersAdmin from "../views/admin/Orders.vue";
 import UsersAdmin from "../views/admin/Users.vue";
 import CategoriesAdmin from "../views/admin/Categories.vue";
+import OptionsAdmin from "../views/admin/Options.vue";
+import ToppingsAdmin from "../views/admin/Toppings.vue";
 import GoogleCallback from "../views/auth/GoogleCallback.vue";
 import Wishlist from "../views/Wishlist.vue";
 
@@ -116,6 +118,16 @@ const routes = [
         path: "/dashboard/categories",
         name: "categoriesadmin",
         component: CategoriesAdmin,
+    },
+    {
+        path: "/dashboard/options",
+        name: "optionsadmin",
+        component: OptionsAdmin,
+    },
+    {
+        path: "/dashboard/toppings",
+        name: "toppingsadmin",
+        component: ToppingsAdmin,
     },
     {
         path: "/auth/google/callback",

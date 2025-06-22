@@ -142,6 +142,20 @@ Route::middleware(['jwt.auth'])->prefix('admin')->group(function () {
     Route::get('/users/{user}', [AdminController::class, 'showUser']);
     Route::put('/users/{user}', [AdminController::class, 'updateUser']);
     Route::delete('/users/{user}', [AdminController::class, 'deleteUser']);
+
+    // Options
+    Route::get('/options', [OptionController::class, 'index']);
+    Route::post('/options', [OptionController::class, 'store']);
+    Route::get('/options/{option}', [OptionController::class, 'show']);
+    Route::put('/options/{option}', [OptionController::class, 'update']);
+    Route::delete('/options/{option}', [OptionController::class, 'destroy']);
+
+    // Toppings
+    Route::get('/toppings', [ToppingController::class, 'indexAdmin']);
+    Route::post('/toppings', [ToppingController::class, 'store']);
+    Route::get('/toppings/{topping}', [ToppingController::class, 'show']);
+    Route::put('/toppings/{topping}', [ToppingController::class, 'update']);
+    Route::delete('/toppings/{topping}', [ToppingController::class, 'destroy']);
 });
 
 // Google OAuth Routes
