@@ -145,9 +145,29 @@ class ProductController extends Controller
         return ApiResponse::success($updatedProduct->transform(), 'Product updated successfully', 200);
     }
 
-    public function destroy(Product $product)
+    public function destroy(string   $id)
     {
-        $product->delete();
-        return response()->json(null, 204);
+        try {
+            $product = $this->productService->getProductById($id);
+            if (!$product) {
+                return ApiResponse::error('Product not found', 404);
+            }
+            broadcast(new ProductUpdated($product))->toOthers();
+
+            // Detach options and toppings
+            $product->options()->detach();
+            $product->toppings()->detach();
+
+            // Delete the product
+            $product->delete();
+
+            return APIResponse::success([], 'Product deleted successfully', 200);
+        } catch (\Exception $e) {
+            Log::error('Failed to delete product', [
+                'error' => $e->getMessage(),
+                'product_id' => $id
+            ]);
+            return APIResponse::error('Failed to delete product', 500);
+        }
     }
 }

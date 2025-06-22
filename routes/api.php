@@ -120,7 +120,7 @@ Route::middleware(['jwt.auth'])->prefix('admin')->group(function () {
     Route::post('/products', [ProductController::class, 'store']);
     Route::get('/products/{id}', [ProductController::class, 'show']);
     Route::put('/products/{id}', [ProductController::class, 'update']);
-    Route::delete('/products/{product}', [ProductController::class, 'destroy']);
+    Route::delete('/products/{id}', [ProductController::class, 'destroy']);
 
     // Categories
     Route::get('/categories', [CategoryController::class, 'index']);
