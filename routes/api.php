@@ -33,6 +33,7 @@ Route::get('/orders/histories', function () {
 // auth
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/refresh', [AuthController::class, 'refresh']);
 
 // product
 Route::get('/products', [ProductController::class, 'index']);
@@ -119,7 +120,7 @@ Route::middleware(['jwt.auth'])->prefix('admin')->group(function () {
     Route::post('/products', [ProductController::class, 'store']);
     Route::get('/products/{id}', [ProductController::class, 'show']);
     Route::put('/products/{id}', [ProductController::class, 'update']);
-    Route::delete('/products/{product}', [ProductController::class, 'destroy']);
+    Route::delete('/products/{id}', [ProductController::class, 'destroy']);
 
     // Categories
     Route::get('/categories', [CategoryController::class, 'index']);
@@ -141,6 +142,20 @@ Route::middleware(['jwt.auth'])->prefix('admin')->group(function () {
     Route::get('/users/{user}', [AdminController::class, 'showUser']);
     Route::put('/users/{user}', [AdminController::class, 'updateUser']);
     Route::delete('/users/{user}', [AdminController::class, 'deleteUser']);
+
+    // Options
+    Route::get('/options', [OptionController::class, 'index']);
+    Route::post('/options', [OptionController::class, 'store']);
+    Route::get('/options/{option}', [OptionController::class, 'show']);
+    Route::put('/options/{option}', [OptionController::class, 'update']);
+    Route::delete('/options/{option}', [OptionController::class, 'destroy']);
+
+    // Toppings
+    Route::get('/toppings', [ToppingController::class, 'indexAdmin']);
+    Route::post('/toppings', [ToppingController::class, 'store']);
+    Route::get('/toppings/{topping}', [ToppingController::class, 'show']);
+    Route::put('/toppings/{topping}', [ToppingController::class, 'update']);
+    Route::delete('/toppings/{topping}', [ToppingController::class, 'destroy']);
 });
 
 // Google OAuth Routes

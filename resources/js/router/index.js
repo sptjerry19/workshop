@@ -9,11 +9,14 @@ import News from "../views/News.vue";
 import NewsDetail from "../views/NewsDetail.vue";
 import Contact from "../views/Contact.vue";
 import Cart from "../views/Cart.vue";
+import Story from "../views/Story.vue";
 import ProductsAdmin from "../views/admin/Products.vue";
 import NewsAdmin from "../views/admin/News.vue";
 import OrdersAdmin from "../views/admin/Orders.vue";
 import UsersAdmin from "../views/admin/Users.vue";
 import CategoriesAdmin from "../views/admin/Categories.vue";
+import OptionsAdmin from "../views/admin/Options.vue";
+import ToppingsAdmin from "../views/admin/Toppings.vue";
 import GoogleCallback from "../views/auth/GoogleCallback.vue";
 import Wishlist from "../views/Wishlist.vue";
 
@@ -51,6 +54,11 @@ const routes = [
         path: "/about",
         name: "about",
         component: About,
+    },
+    {
+        path: "/story",
+        name: "story",
+        component: Story,
     },
     {
         path: "/products",
@@ -110,6 +118,16 @@ const routes = [
         path: "/dashboard/categories",
         name: "categoriesadmin",
         component: CategoriesAdmin,
+    },
+    {
+        path: "/dashboard/options",
+        name: "optionsadmin",
+        component: OptionsAdmin,
+    },
+    {
+        path: "/dashboard/toppings",
+        name: "toppingsadmin",
+        component: ToppingsAdmin,
     },
     {
         path: "/auth/google/callback",

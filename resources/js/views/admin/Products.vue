@@ -718,12 +718,14 @@
             </div>
         </div>
     </AdminLayout>
+    <AdminChatBox />
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import AdminLayout from "@/layouts/AdminLayout.vue";
-import axios from "axios";
+import AdminChatBox from "../../components/AdminChatBox.vue";
+import api from "@/api";
 
 const products = ref({
     data: [],
@@ -790,6 +792,7 @@ const pages = computed(() => {
 function goToPage(page) {
     if (page !== products.value.pagination.current_page) {
         products.value.pagination.current_page = page;
+        products.value.current_page = page;
         fetchProducts();
     }
 }
@@ -871,9 +874,7 @@ async function fetchProducts() {
         if (products.value.current_page > 1)
             params.append("page", products.value.pagination.current_page);
 
-        const response = await axios.get(
-            `/api/admin/products?${params.toString()}`
-        );
+        const response = await api.get(`/admin/products?${params.toString()}`);
         if (response.data.success) {
             products.value.data = response.data.data;
             products.value.pagination = response.data.pagination;
@@ -885,7 +886,7 @@ async function fetchProducts() {
 
 async function fetchCategories() {
     try {
-        const response = await axios.get("/api/categories");
+        const response = await api.get("/categories");
         if (response.data.success) {
             categories.value = response.data.data;
         }
@@ -896,7 +897,7 @@ async function fetchCategories() {
 
 async function fetchOptions() {
     try {
-        const response = await axios.get("/api/options");
+        const response = await api.get("/options");
         if (response.data.success) {
             options.value = response.data.data;
         }
@@ -907,7 +908,7 @@ async function fetchOptions() {
 
 async function fetchToppings() {
     try {
-        const response = await axios.get("/api/toppings");
+        const response = await api.get("/toppings");
         if (response.data.success) {
             toppings.value = response.data.data;
         }
@@ -945,7 +946,7 @@ async function deleteProduct(id) {
     if (!confirm("Are you sure you want to delete this product?")) return;
 
     try {
-        const response = await axios.delete(`/api/admin/products/${id}`);
+        const response = await api.delete(`/admin/products/${id}`);
         if (response.data.success) {
             fetchProducts();
         }
@@ -972,11 +973,11 @@ async function submitForm() {
 
     try {
         const url = showEditModal.value
-            ? `/api/admin/products/${form.value.id}`
-            : "/api/admin/products";
+            ? `/admin/products/${form.value.id}`
+            : "/admin/products";
         const method = showEditModal.value ? "put" : "post";
 
-        const response = await axios[method](url, form.value);
+        const response = await api[method](url, form.value);
 
         if (response.data.success) {
             form.value = getDefaultForm();
@@ -999,6 +1000,7 @@ function closeModal() {
 function prevPage() {
     if (products.value.pagination.current_page > 1) {
         products.value.pagination.current_page--;
+        products.value.current_page--;
         fetchProducts();
     }
 }
@@ -1009,6 +1011,7 @@ function nextPage() {
         products.value.pagination.last_page
     ) {
         products.value.pagination.current_page++;
+        products.value.current_page++;
         fetchProducts();
     }
 }

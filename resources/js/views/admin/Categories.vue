@@ -179,12 +179,14 @@
             </div>
         </div>
     </AdminLayout>
+    <AdminChatBox />
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
 import AdminLayout from "@/layouts/AdminLayout.vue";
-import axios from "axios";
+import AdminChatBox from "../../components/AdminChatBox.vue";
+import api from "@/api";
 
 const categories = ref([]);
 const showCreateModal = ref(false);
@@ -202,7 +204,7 @@ onMounted(() => {
 
 async function fetchCategories() {
     try {
-        const response = await axios.get("/api/admin/categories");
+        const response = await api.get("/admin/categories");
         if (response.data.success) {
             categories.value = response.data.data;
         }
@@ -220,7 +222,7 @@ async function deleteCategory(id) {
     if (!confirm("Are you sure you want to delete this category?")) return;
 
     try {
-        const response = await axios.delete(`/api/admin/categories/${id}`);
+        const response = await api.delete(`/admin/categories/${id}`);
         if (response.data.success) {
             fetchCategories();
         }
@@ -232,11 +234,11 @@ async function deleteCategory(id) {
 async function submitForm() {
     try {
         const url = showEditModal.value
-            ? `/api/admin/categories/${form.value.id}`
-            : "/api/admin/categories";
+            ? `/admin/categories/${form.value.id}`
+            : "/admin/categories";
         const method = showEditModal.value ? "put" : "post";
 
-        const response = await axios[method](url, {
+        const response = await api[method](url, {
             name: form.value.name,
             description: form.value.description,
             status: form.value.status,

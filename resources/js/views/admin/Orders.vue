@@ -401,12 +401,15 @@
             </div>
         </div>
     </AdminLayout>
+    <AdminChatBox />
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import AdminLayout from "@/layouts/AdminLayout.vue";
+import AdminChatBox from "../../components/AdminChatBox.vue";
 import axios from "axios";
+import api from "@/api.js";
 import Echo from "laravel-echo";
 
 const orders = ref({
@@ -504,8 +507,8 @@ function showUpdateStatusModal(order) {
 
 async function updateOrderStatus() {
     try {
-        const response = await axios.patch(
-            `/api/admin/orders/${updateData.value.order_id}/status`,
+        const response = await api.patch(
+            `/admin/orders/${updateData.value.order_id}/status`,
             {
                 order_status: updateData.value.order_status,
                 payment_status: updateData.value.payment_status,

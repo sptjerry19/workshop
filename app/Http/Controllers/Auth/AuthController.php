@@ -149,4 +149,37 @@ class AuthController extends Controller
     {
         return response()->json($request->user());
     }
+
+    public function refresh(Request $request)
+    {
+        try {
+            // Get the current token from the request
+            $token = $request->bearerToken();
+
+            if (!$token) {
+                return response()->json(['error' => 'No token provided'], 401);
+            }
+
+            // Decode the current token to get user info
+            $decoded = JWT::decode($token, new Key(env('JWT_SECRET'), 'HS256'));
+
+            // Get the user
+            $user = User::find($decoded->sub);
+
+            if (!$user) {
+                return response()->json(['error' => 'User not found'], 401);
+            }
+
+            // Generate new token
+            $newToken = $this->generateToken($user);
+
+            return response()->json([
+                'user' => $user,
+                'token' => $newToken
+            ]);
+        } catch (Exception $e) {
+            Log::error('Token refresh error: ' . $e->getMessage());
+            return response()->json(['error' => 'Invalid token'], 401);
+        }
+    }
 }

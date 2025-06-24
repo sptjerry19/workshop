@@ -218,12 +218,14 @@
             </div>
         </div>
     </div>
+    <ChatBox />
 </template>
 
 <script setup>
 import { ref } from "vue";
 import axios from "axios";
 import Banner from "../components/Banner.vue";
+import ChatBox from "../components/ChatBox.vue";
 
 // Khởi tạo API client
 const api = axios.create({

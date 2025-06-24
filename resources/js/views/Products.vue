@@ -131,11 +131,13 @@
             </div>
         </div>
     </div>
+    <ChatBox />
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import Banner from "../components/Banner.vue";
+import ChatBox from "../components/ChatBox.vue";
 import api from "../api.js";
 
 const products = ref([]);

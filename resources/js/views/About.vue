@@ -5,8 +5,9 @@
         <div class="text-center mb-16">
             <h1 class="text-4xl font-bold text-gray-900 mb-4">Về Chúng Tôi</h1>
             <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                Chúng tôi tự hào là đơn vị cung cấp các sản phẩm trái cây và rau
-                củ tươi ngon, chất lượng cao cho người tiêu dùng Việt Nam.
+                Chúng tôi tự hào là đơn vị chuyên cung cấp các loại bánh kem
+                tươi ngon và nước uống chất lượng, mang đến trải nghiệm ngọt
+                ngào và sảng khoái cho khách hàng trên toàn Việt Nam.
             </p>
         </div>
 
@@ -17,9 +18,9 @@
                     Sứ Mệnh
                 </h2>
                 <p class="text-gray-600">
-                    Mang đến cho khách hàng những sản phẩm tươi ngon nhất, đảm
-                    bảo an toàn vệ sinh thực phẩm và góp phần nâng cao chất
-                    lượng cuộc sống.
+                    Mang đến cho khách hàng những chiếc bánh kem tinh tế và thức
+                    uống thơm ngon, đảm bảo vệ sinh an toàn thực phẩm, góp phần
+                    làm cho những khoảnh khắc đời thường trở nên đặc biệt hơn.
                 </p>
             </div>
             <div class="bg-white p-8 rounded-lg shadow-lg">
@@ -27,9 +28,9 @@
                     Tầm Nhìn
                 </h2>
                 <p class="text-gray-600">
-                    Trở thành đơn vị dẫn đầu trong lĩnh vực cung cấp trái cây và
-                    rau củ tươi ngon, đáp ứng nhu cầu ngày càng cao của người
-                    tiêu dùng.
+                    Trở thành thương hiệu hàng đầu trong lĩnh vực bánh kem và
+                    nước uống tại Việt Nam, luôn đổi mới để phục vụ tốt nhất nhu
+                    cầu ngày càng đa dạng của người tiêu dùng.
                 </p>
             </div>
         </div>
@@ -60,7 +61,8 @@
                     </div>
                     <h3 class="text-xl font-semibold mb-2">Chất Lượng</h3>
                     <p class="text-gray-600">
-                        Cam kết cung cấp sản phẩm chất lượng cao nhất
+                        Cam kết sử dụng nguyên liệu cao cấp và quy trình chế
+                        biến an toàn để mang đến sản phẩm chất lượng vượt trội.
                     </p>
                 </div>
                 <div class="text-center">
@@ -82,7 +84,10 @@
                         </svg>
                     </div>
                     <h3 class="text-xl font-semibold mb-2">Đúng Hẹn</h3>
-                    <p class="text-gray-600">Giao hàng đúng thời gian đã hẹn</p>
+                    <p class="text-gray-600">
+                        Luôn đảm bảo giao bánh và nước đúng thời gian cam kết,
+                        đặc biệt là trong những dịp quan trọng của khách hàng.
+                    </p>
                 </div>
                 <div class="text-center">
                     <div
@@ -104,7 +109,8 @@
                     </div>
                     <h3 class="text-xl font-semibold mb-2">Tận Tâm</h3>
                     <p class="text-gray-600">
-                        Phục vụ khách hàng với sự tận tâm và chuyên nghiệp
+                        Phục vụ khách hàng bằng sự tận tình, chu đáo và chuyên
+                        nghiệp – vì mỗi đơn hàng là một niềm vui được trao gửi.
                     </p>
                 </div>
             </div>
@@ -118,38 +124,40 @@
             <div class="grid md:grid-cols-4 gap-8">
                 <div class="text-center">
                     <img
-                        src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&h=256&q=80"
+                        src="https://scontent.fhan17-1.fna.fbcdn.net/v/t39.30808-6/496146898_2480815602268778_5484722586679084187_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=833d8c&_nc_ohc=VbjgO3beneQQ7kNvwFgCTxF&_nc_oc=AdlI5mufnPM-mKQlAOhkR3tmtQF4uf6vum5ix7ydm5zJXJQorLeYuOb4OXf9MTCwwbM&_nc_zt=23&_nc_ht=scontent.fhan17-1.fna&_nc_gid=CTgWiL2HhBKn48nOI82Tsw&oh=00_AfO-MOzyPPnGWUmmaIU6OMkBoeWLWsPM-15WdkqyB0kkwQ&oe=685C2065"
                         alt="Team member"
                         class="w-32 h-32 rounded-full mx-auto mb-4 object-cover"
                     />
-                    <h3 class="text-xl font-semibold mb-2">Nguyễn Văn A</h3>
+                    <h3 class="text-xl font-semibold mb-2">Vũ Quỳnh Chi</h3>
                     <p class="text-gray-600">Giám đốc</p>
                 </div>
                 <div class="text-center">
                     <img
-                        src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&h=256&q=80"
+                        src="https://scontent.fhan17-1.fna.fbcdn.net/v/t1.6435-9/153160261_754008835542193_5832049104951454653_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=OXz-jBFraVUQ7kNvwFk_amN&_nc_oc=AdlXlfYLMvLhqfEN3hVqLS7VOxuNw0df7Wb8WoH8OwjTzlotE05XlaOExTeJfFoP5sQ&_nc_zt=23&_nc_ht=scontent.fhan17-1.fna&_nc_gid=8eCeRlDn_1Mhpnvb-NKZug&oh=00_AfPywpAjNzs2Dd9qtuorpVxszebY3SC-X79869_Bf0U2Jg&oe=687D97D2"
                         alt="Team member"
                         class="w-32 h-32 rounded-full mx-auto mb-4 object-cover"
                     />
-                    <h3 class="text-xl font-semibold mb-2">Trần Thị B</h3>
+                    <h3 class="text-xl font-semibold mb-2">Phạm Xuân Đại</h3>
                     <p class="text-gray-600">Quản lý chất lượng</p>
                 </div>
                 <div class="text-center">
                     <img
-                        src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&h=256&q=80"
+                        src="https://scontent.fhan17-1.fna.fbcdn.net/v/t39.30808-6/492374054_4060139854129688_2558808000272839634_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=833d8c&_nc_ohc=KKG7YfLh_HkQ7kNvwFhmgy-&_nc_oc=Adl5AVPyH9B4py-GtEsM4_mguGJQ2TAJpPIS6jG2uFtxpiQHJ6z6qRBsJTdXmCjo_PE&_nc_zt=23&_nc_ht=scontent.fhan17-1.fna&_nc_gid=2Q80A0WQiGqdPPHWVIb_YA&oh=00_AfNm3emMXzBWyrXpGn80528qe6fA9LXKMW9r9HLSEA6RDg&oe=685C00B4"
                         alt="Team member"
                         class="w-32 h-32 rounded-full mx-auto mb-4 object-cover"
                     />
-                    <h3 class="text-xl font-semibold mb-2">Lê Văn C</h3>
+                    <h3 class="text-xl font-semibold mb-2">Đỗ Anh Thư</h3>
                     <p class="text-gray-600">Trưởng phòng kinh doanh</p>
                 </div>
                 <div class="text-center">
                     <img
-                        src="https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&h=256&q=80"
+                        src="https://scontent.fhan17-1.fna.fbcdn.net/v/t39.30808-6/497621151_2510393292633849_5259222605295994212_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=833d8c&_nc_ohc=pvO3QoDOLIAQ7kNvwGISBDk&_nc_oc=Adkuf6MHAMse705qf8wZYn89WBCFrUKXz8YriQozWPFWqqJzcuSTnCBNAjxTclEMaFY&_nc_zt=23&_nc_ht=scontent.fhan17-1.fna&_nc_gid=igZYOIReYno5e6iuJVKeBg&oh=00_AfOLQ4mpOwwRajhISLzq_em07CC7Je9d7s_782j3AlMjTg&oe=685BEC39"
                         alt="Team member"
                         class="w-32 h-32 rounded-full mx-auto mb-4 object-cover"
                     />
-                    <h3 class="text-xl font-semibold mb-2">Phạm Thị D</h3>
+                    <h3 class="text-xl font-semibold mb-2">
+                        Trần Thị Thúy Hường
+                    </h3>
                     <p class="text-gray-600">Chuyên gia tư vấn</p>
                 </div>
             </div>

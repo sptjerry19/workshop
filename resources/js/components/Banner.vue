@@ -4,12 +4,12 @@
             class="fixed top-0 left-0 right-0 bg-white z-50 max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8"
         >
             <div
-                class="flex items-center justify-between py-6 border-b border-gray-200"
+                class="flex items-center justify-between py-6 border-b border-gray-200 mobile-header-row"
             >
                 <router-link to="/" class="flex items-center space-x-6">
                     <div class="flex items-center space-x-1">
                         <h1
-                            class="text-2xl font-extrabold text-black flex items-center gap-1"
+                            class="text-2xl font-extrabold text-black flex items-center gap-1 mobile-logo"
                         >
                             <span> CheeseCake </span>
                             <svg
@@ -111,7 +111,7 @@
                 </router-link>
                 <form
                     aria-label="Site search"
-                    class="flex flex-1 max-w-4xl mx-6"
+                    class="flex flex-1 max-w-4xl mx-6 mobile-search"
                     role="search"
                 >
                     <SearchDropdown />
@@ -193,6 +193,19 @@
                     </li>
                     <li>
                         <router-link
+                            to="/story"
+                            :class="[
+                                'pb-1 inline-block',
+                                $route.path === '/story'
+                                    ? 'border-b-2 border-black font-semibold'
+                                    : 'hover:underline',
+                            ]"
+                        >
+                            Câu chuyện
+                        </router-link>
+                    </li>
+                    <li>
+                        <router-link
                             to="/products"
                             :class="[
                                 'pb-1 inline-block',
@@ -235,13 +248,13 @@
         </header>
         <main
             v-if="$route.path === '/'"
-            class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 mt-6 pt-32"
+            class="max-w-[1280px] mx-auto sm:px-6 lg:px-8 mt-6 sm:pt-32"
         >
             <section
                 class="flex flex-col lg:flex-row gap-6 bg-[#f9f9f9] rounded-md overflow-hidden"
             >
                 <div
-                    class="flex-1 relative bg-white flex items-center justify-center p-6 lg:p-0"
+                    class="flex-1 relative bg-white flex items-center justify-center lg:p-0"
                 >
                     <img
                         alt="Fresh vegetables in a paper bag including a yellow pepper, carrot, cauliflower, and tomatoes on a white background"
@@ -309,7 +322,7 @@
                             alt="Icon of fresh vegetables with lettuce and tomato in a circle with dotted border"
                             class="w-16 h-16"
                             height="64"
-                            src="https://storage.googleapis.com/a1aa/image/05faf25a-05ac-48c6-3ee2-3ce94107b724.jpg"
+                            src="https://thumbs.dreamstime.com/b/handy-glyph-style-icon-food-cloche-serving-handy-glyph-style-icon-food-cloche-serving-375746502.jpg"
                             width="64"
                         />
                     </div>
@@ -328,7 +341,7 @@
                             alt="Icon of 100% organic leaf with circle dotted border"
                             class="w-16 h-16"
                             height="64"
-                            src="https://storage.googleapis.com/a1aa/image/ef215099-dfbe-4a22-76e5-09922533bed8.jpg"
+                            src="https://static.vecteezy.com/system/resources/previews/012/956/668/original/a-cup-of-hot-drink-tea-coffee-cocoa-etc-design-for-poster-card-sticker-coffee-shop-or-cafe-logo-menu-the-concept-of-relaxation-coffee-break-illustration-isolated-on-white-background-vector.jpg"
                             width="64"
                         />
                     </div>
@@ -347,7 +360,7 @@
                             alt="Icon of quality leaves recycle symbol with dotted circle border"
                             class="w-16 h-16"
                             height="64"
-                            src="https://storage.googleapis.com/a1aa/image/29bed7f7-2701-41df-290c-aa0eaf338e90.jpg"
+                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRl5LJkKxsBS_eqPbxw53yfUFmiDYVzPlECUw&s"
                             width="64"
                         />
                     </div>
@@ -380,6 +393,74 @@
     </div>
 </template>
 
+<style scoped>
+@media (max-width: 640px) {
+    header {
+        position: static !important;
+        max-width: 100vw !important;
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+    .mobile-header-row {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.5rem !important;
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+    }
+    .mobile-logo {
+        font-size: 1.25rem !important;
+    }
+    .mobile-search {
+        width: 100% !important;
+        margin: 0.5rem 0 !important;
+        max-width: 100% !important;
+    }
+    .mobile-user-menu {
+        width: 100% !important;
+        justify-content: flex-start !important;
+        margin-bottom: 0.5rem !important;
+    }
+    nav {
+        border-bottom: none !important;
+        padding: 0 !important;
+    }
+    .mobile-nav {
+        display: none;
+        flex-direction: column;
+        background: #fff;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100vw;
+        z-index: 100;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border-bottom: 1px solid #eee;
+    }
+    .mobile-nav.open {
+        display: flex;
+    }
+    .mobile-nav-link {
+        padding: 1rem;
+        border-bottom: 1px solid #eee;
+        color: #222;
+        font-size: 1rem;
+        font-weight: 500;
+        text-align: left;
+    }
+    .mobile-nav-link:last-child {
+        border-bottom: none;
+    }
+    .mobile-category-btn {
+        width: 100%;
+        justify-content: flex-start;
+        font-size: 1rem;
+        padding: 0.75rem 1rem;
+        margin-bottom: 0.5rem;
+    }
+}
+</style>
+
 <script>
 import UserMenu from "./UserMenu.vue";
 import SearchDropdown from "./SearchDropdown.vue";
@@ -394,6 +475,7 @@ export default {
         return {
             cartCount: 0,
             baseImageUrl: import.meta.env.VITE_RESPONE_IMAGE_URL,
+            showMobileNav: false,
         };
     },
     mounted() {
@@ -424,6 +506,12 @@ export default {
             } catch {
                 this.cartCount = 0;
             }
+        },
+        toggleMobileNav() {
+            this.showMobileNav = !this.showMobileNav;
+        },
+        closeMobileNav() {
+            this.showMobileNav = false;
         },
     },
 };

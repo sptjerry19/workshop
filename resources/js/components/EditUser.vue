@@ -76,7 +76,7 @@
 
 <script setup>
 import { ref, watch } from "vue";
-import axios from "axios";
+import api from "@/api";
 
 const props = defineProps({
     show: Boolean,
@@ -115,7 +115,7 @@ const closeModal = () => {
 const handleSubmit = async () => {
     try {
         loading.value = true;
-        const response = await axios.put("/api/user/update", formData.value);
+        const response = await api.put("/user/update", formData.value);
 
         if (response.data.success) {
             // Update user cookie with new data

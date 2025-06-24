@@ -79,7 +79,7 @@
 <script>
 import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
+import api from "@/api";
 import EditUser from "./EditUser.vue";
 
 export default {
@@ -118,12 +118,11 @@ export default {
                 } else {
                     // If not in cookie, fetch from API
                     const tokenValue = token.split("=")[1];
-                    axios
-                        .get("/api/user", {
-                            headers: {
-                                Authorization: `Bearer ${tokenValue}`,
-                            },
-                        })
+                    api.get("/user", {
+                        headers: {
+                            Authorization: `Bearer ${tokenValue}`,
+                        },
+                    })
                         .then((response) => {
                             console.log("User data from API:", response.data);
                             user.value = response.data;
@@ -171,7 +170,7 @@ export default {
 
         const handleLogout = async () => {
             try {
-                await axios.post("/api/logout");
+                await api.post("/logout");
                 document.cookie =
                     "token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
                 document.cookie =

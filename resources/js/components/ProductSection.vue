@@ -5,7 +5,9 @@
             <ProductCard v-for="p in products" :key="p.id" :product="p" />
         </div>
     </section> -->
-    <div class="relative max-w-[1200px] mx-auto px-4 py-8 mt-20">
+    <div
+        class="relative max-w-[1200px] mx-auto px-4 py-8 mt-20 product-section-mobile"
+    >
         <h2 class="text-lg font-semibold">{{ title }}</h2>
         <!-- Tabs on top right -->
         <div
@@ -45,10 +47,10 @@
                 Khuyến mãi
             </div>
         </div>
-        <div class="flex gap-6">
+        <div class="flex gap-6 product-section-mobile">
             <!-- Left big promo block -->
             <div
-                class="flex flex-col justify-between bg-[#eeb600] text-white rounded-md p-6 w-[280px] h-[480px] shrink-0"
+                class="flex flex-col justify-between bg-[#eeb600] text-white rounded-md p-6 w-[280px] h-[480px] shrink-0 promo-block"
             >
                 <div class="text-xl leading-snug font-semibold">
                     Bánh ngon
@@ -78,7 +80,7 @@
                 </div>
                 <div v-else>
                     <!-- First two rows -->
-                    <div class="grid grid-cols-5 gap-6 mb-6">
+                    <div class="grid grid-cols-5 gap-6 mb-6 product-grid">
                         <ProductCard
                             v-for="p in displayedProducts"
                             :key="p.id"
@@ -212,5 +214,20 @@ console.log("Products in ProductSection:", props.products);
 </script>
 
 <style>
-/* Remove any unnecessary styles */
+@media (max-width: 640px) {
+    .product-section-mobile {
+        flex-direction: column !important;
+        gap: 1rem !important;
+        padding: 0.5rem !important;
+    }
+    .product-section-mobile .promo-block {
+        width: 100% !important;
+        height: auto !important;
+        margin-bottom: 1rem;
+    }
+    .product-section-mobile .product-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 0.5rem !important;
+    }
+}
 </style>
