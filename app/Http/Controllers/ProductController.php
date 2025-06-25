@@ -11,6 +11,10 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Services\ProductService;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProductController extends Controller
 {
@@ -145,7 +149,7 @@ class ProductController extends Controller
         return ApiResponse::success($updatedProduct->transform(), 'Product updated successfully', 200);
     }
 
-    public function destroy(string   $id)
+    public function destroy(string $id)
     {
         try {
             $product = $this->productService->getProductById($id);
@@ -169,5 +173,149 @@ class ProductController extends Controller
             ]);
             return APIResponse::error('Failed to delete product', 500);
         }
+    }
+
+    public function exportCsv(Request $request)
+    {
+        try {
+            $params = $request->only([
+                'q',
+                'category_id',
+                'sort_by',
+                'sort_order',
+                'per_page',
+                'take',
+            ]);
+
+            $fileName = 'products_export_' . now()->format('Ymd_His') . '.csv';
+            $headers = [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => "attachment; filename=\"$fileName\"",
+            ];
+
+            $callback = function () use ($params) {
+                $handle = fopen('php://output', 'w');
+
+                // Thêm BOM UTF-8 để Excel nhận đúng tiếng Việt
+                fwrite($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+                // Header
+                fputcsv($handle, [
+                    'id',
+                    'name',
+                    'description',
+                    'price',
+                    'image',
+                    'category_name',
+                    'is_active',
+                    'stock',
+                    'discount',
+                    'size',
+                    'options',
+                    'toppings'
+                ]);
+                // Data
+                $products = $this->productService->getAllProductsForExport($params);
+                foreach ($products as $product) {
+                    $transformed = $product->transform();
+                    // options: name:value,name:value,...
+                    $options = collect($transformed['options'])->map(function ($option) {
+                        $values = collect($option['values'])->map(function ($v) {
+                            return $v['value'];
+                        })->implode('|');
+                        return $option['name'] . ($values ? (':' . $values) : '');
+                    })->implode(',');
+                    // toppings: name|price,name|price,...
+                    $toppings = collect($transformed['toppings'])->map(function ($topping) {
+                        return $topping['name'] . (isset($topping['price']) ? ('|' . $topping['price']) : '');
+                    })->implode(',');
+                    fputcsv($handle, [
+                        $transformed['id'],
+                        $transformed['name'],
+                        $transformed['description'],
+                        $transformed['price'],
+                        $transformed['image'],
+                        $transformed['category_name'],
+                        $product->is_active,
+                        $transformed['stock'],
+                        $transformed['discount'],
+                        json_encode($transformed['size']),
+                        $options,
+                        $toppings,
+                    ]);
+                }
+                fclose($handle);
+            };
+            return response()->stream($callback, 200, $headers);
+        } catch (\Exception $e) {
+            return APIResponse::error('Export failed: ' . $e->getMessage(), 500);
+        }
+    }
+
+    public function importCsv(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'file' => 'required|file|mimes:csv,txt',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+        }
+
+        $file = $request->file('file');
+        $handle = fopen($file->getRealPath(), 'r');
+        $header = fgetcsv($handle);
+
+        $results = [
+            'created' => [],
+            'updated' => [],
+            'errors' => [],
+        ];
+
+        DB::beginTransaction();
+        try {
+            while (($row = fgetcsv($handle)) !== false) {
+                $data = array_combine($header, $row);
+
+                // Parse fields
+                $data['size'] = $data['size'] ? json_decode($data['size'], true) : [];
+                $data['options'] = $data['options'] ? explode(',', $data['options']) : [];
+                $data['toppings'] = $data['toppings'] ? explode(',', $data['toppings']) : [];
+
+                // Validate each row (basic)
+                $rowValidator = Validator::make($data, [
+                    'name' => 'required|string|max:255',
+                    'description' => 'required|string',
+                    'price' => 'required|numeric|min:0',
+                    'image' => 'required|string',
+                    'category_id' => 'required|exists:categories,id',
+                    'stock' => 'required|integer|min:0',
+                    'discount' => 'nullable|numeric|min:0',
+                ]);
+                if ($rowValidator->fails()) {
+                    $results['errors'][] = [
+                        'row' => $data,
+                        'errors' => $rowValidator->errors()->all(),
+                    ];
+                    continue;
+                }
+
+                // Create or update
+                if (!empty($data['id'])) {
+                    $result = $this->productService->updateOrCreateProduct($data, true);
+                    $results['updated'][] = $result;
+                } else {
+                    $result = $this->productService->updateOrCreateProduct($data, false);
+                    $results['created'][] = $result;
+                }
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return APIResponse::error('Import failed: ' . $e->getMessage(), 500);
+        } finally {
+            fclose($handle);
+        }
+
+        return APIResponse::success($results, 'Import completed', 200);
     }
 }

@@ -65,6 +65,27 @@ class ProductService extends BaseService
         }
     }
 
+    public function getAllProductsForExport(array $params)
+    {
+        $keyword = $params['q'] ?? null;
+        $categoryId = $params['category_id'] ?? null;
+        $sortBy = $params['sort_by'] ?? 'created_at';
+        $sortOrder = $params['sort_order'] ?? 'desc';
+
+        try {
+            $products = Product::with('category')
+                ->when($keyword, fn($query) => $query->where('name', 'like', "%$keyword%"))
+                ->when($categoryId, fn($query) => $query->where('category_id', $categoryId))
+                ->orderBy($sortBy, $sortOrder)
+                ->get();
+
+            return $products;
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return false;
+        }
+    }
+
     public function getProductById($id)
     {
         try {
@@ -113,5 +134,43 @@ class ProductService extends BaseService
     public function deleteProduct(Product $product)
     {
         return $product->delete();
+    }
+
+
+    // Tạo mới hoặc cập nhật sản phẩm từ dòng CSV
+    public function updateOrCreateProduct($data, $isUpdate = false)
+    {
+        // Chuẩn hóa dữ liệu
+        $fields = [
+            'name' => $data['name'],
+            'description' => $data['description'],
+            'price' => $data['price'],
+            'image' => $data['image'],
+            'category_id' => $data['category_id'],
+            'is_active' => isset($data['is_active']) ? (bool)$data['is_active'] : true,
+            'stock' => $data['stock'],
+            'discount' => $data['discount'] ?? null,
+            'size' => $data['size'] ?? [],
+        ];
+
+        if ($isUpdate && !empty($data['id'])) {
+            $product = Product::find($data['id']);
+            if (!$product) {
+                throw new \Exception('Product not found: ' . $data['id']);
+            }
+            $product->update($fields);
+        } else {
+            $product = Product::create($fields);
+        }
+
+        // Sync options & toppings
+        if (isset($data['options'])) {
+            $product->options()->sync($data['options']);
+        }
+        if (isset($data['toppings'])) {
+            $product->toppings()->sync($data['toppings']);
+        }
+
+        return $product->fresh(['options', 'toppings']);
     }
 }

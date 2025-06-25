@@ -3,12 +3,31 @@
         <!-- Header -->
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-semibold text-gray-900">Products</h1>
-            <button
-                @click="showCreateModal = true"
-                class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-            >
-                Add New Product
-            </button>
+            <div class="flex gap-2">
+                <button
+                    @click="downloadCsv"
+                    class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+                >
+                    Export CSV
+                </button>
+                <label
+                    class="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 cursor-pointer"
+                >
+                    Import CSV
+                    <input
+                        type="file"
+                        accept=".csv"
+                        @change="handleImportCsv"
+                        class="hidden"
+                    />
+                </label>
+                <button
+                    @click="showCreateModal = true"
+                    class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                >
+                    Add New Product
+                </button>
+            </div>
         </div>
 
         <!-- Filters -->
@@ -1028,6 +1047,55 @@ function getStatusBadgeClass(status) {
         "bg-green-100 text-green-800": status === "active",
         "bg-red-100 text-red-800": status === "inactive",
     };
+}
+
+// Export CSV
+async function downloadCsv() {
+    try {
+        const response = await api.get("/admin/products-export", {
+            responseType: "blob",
+        });
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "products_export.csv");
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    } catch (error) {
+        alert("Export CSV failed!");
+        console.error(error);
+    }
+}
+
+// Import CSV
+async function handleImportCsv(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+        const response = await api.post("/admin/products-import", formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+        });
+        if (response.data.success) {
+            alert(
+                "Import thành công!\nTạo mới: " +
+                    response.data.data.created.length +
+                    "\nCập nhật: " +
+                    response.data.data.updated.length +
+                    "\nLỗi: " +
+                    response.data.data.errors.length
+            );
+            fetchProducts();
+        } else {
+            alert("Import thất bại: " + (response.data.message || ""));
+        }
+    } catch (error) {
+        alert("Import CSV failed!");
+        console.error(error);
+    }
 }
 </script>
 

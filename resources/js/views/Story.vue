@@ -116,9 +116,7 @@
                     :class="{ 'animate-in': reasonVisible }"
                 >
                     <div class="story-text">
-                        <h2 class="story-subtitle">
-                            Lý do tớ làm trang web này
-                        </h2>
+                        <h2 class="story-subtitle">01/05/2025</h2>
                         <p class="story-paragraph">
                             Trang web này không chỉ là vài dòng chữ, mà là lời
                             hứa còn dang dở. Là nỗi nhớ, là những đêm dài không

@@ -39,22 +39,22 @@ services:
         volumes:
             - ./:/var/www
             - ./docker/nginx:/etc/nginx/conf.d/
-            - ./docker/ssl:/etc/nginx/ssl/
-            - ./docker/letsencrypt:/etc/letsencrypt/
+            # - ./docker/ssl:/etc/nginx/ssl/
+            # - ./docker/letsencrypt:/etc/letsencrypt/
         depends_on:
             - app
         networks:
             - laravel-vue-network
 
-    certbot:
-        image: certbot/certbot
-        container_name: laravel-vue-certbot
-        volumes:
-            - ./docker/letsencrypt:/etc/letsencrypt/
-            - ./docker/ssl:/var/www/html/
-        command: certonly --webroot --webroot-path=/var/www/html --email duylinhvnu@gmail.com --agree-tos --no-eff-email -d aahome.click -d www.aahome.click
-        depends_on:
-            - nginx
+    # certbot:
+    #     image: certbot/certbot
+    #     container_name: laravel-vue-certbot
+    #     volumes:
+    #         - ./docker/letsencrypt:/etc/letsencrypt/
+    #         - ./docker/ssl:/var/www/html/
+    #     command: certonly --webroot --webroot-path=/var/www/html --email duylinhvnu@gmail.com --agree-tos --no-eff-email -d aahome.click -d www.aahome.click
+    #     depends_on:
+    #         - nginx
 
     db:
         image: mysql:8.0
@@ -76,7 +76,7 @@ services:
         restart: unless-stopped
         environment:
             PMA_HOST: laravel-vue-db
-            MYSQL_ROOT_PASSWORD: root  # hoặc hard-code nếu cần, ví dụ: root
+            MYSQL_ROOT_PASSWORD: root # hoặc hard-code nếu cần, ví dụ: root
         ports:
             - "8080:80"
         depends_on:

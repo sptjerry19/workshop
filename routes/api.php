@@ -121,6 +121,9 @@ Route::middleware(['jwt.auth'])->prefix('admin')->group(function () {
     Route::get('/products/{id}', [ProductController::class, 'show']);
     Route::put('/products/{id}', [ProductController::class, 'update']);
     Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+    // CSV Import/Export
+    Route::get('/products-export', [ProductController::class, 'exportCsv']);
+    Route::post('/products-import', [ProductController::class, 'importCsv']);
 
     // Categories
     Route::get('/categories', [CategoryController::class, 'index']);
