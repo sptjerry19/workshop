@@ -10,13 +10,19 @@
                 >
                     Export CSV
                 </button>
+                <button
+                    @click="downloadCsvTemplate"
+                    class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
+                >
+                    Download CSV Template
+                </button>
                 <label
                     class="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 cursor-pointer"
                 >
                     Import CSV
                     <input
                         type="file"
-                        accept=".csv"
+                        accept=".csv , .xlsx"
                         @change="handleImportCsv"
                         class="hidden"
                     />
@@ -1064,6 +1070,25 @@ async function downloadCsv() {
         link.remove();
     } catch (error) {
         alert("Export CSV failed!");
+        console.error(error);
+    }
+}
+
+// Download CSV Template (Excel with 3 sheets)
+async function downloadCsvTemplate() {
+    try {
+        const response = await api.get("/admin/products-import-template", {
+            responseType: "blob",
+        });
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "products_import_template.xlsx");
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    } catch (error) {
+        alert("Download template failed!");
         console.error(error);
     }
 }

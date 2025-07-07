@@ -12,9 +12,6 @@ use App\Models\Product;
 use App\Services\ProductService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProductController extends Controller
 {
@@ -167,155 +164,51 @@ class ProductController extends Controller
 
             return APIResponse::success([], 'Product deleted successfully', 200);
         } catch (\Exception $e) {
-            Log::error('Failed to delete product', [
-                'error' => $e->getMessage(),
-                'product_id' => $id
-            ]);
+            Log::error($e->getMessage());
             return APIResponse::error('Failed to delete product', 500);
         }
     }
 
     public function exportCsv(Request $request)
     {
-        try {
-            $params = $request->only([
-                'q',
-                'category_id',
-                'sort_by',
-                'sort_order',
-                'per_page',
-                'take',
-            ]);
-
-            $fileName = 'products_export_' . now()->format('Ymd_His') . '.csv';
-            $headers = [
-                'Content-Type' => 'text/csv',
-                'Content-Disposition' => "attachment; filename=\"$fileName\"",
-            ];
-
-            $callback = function () use ($params) {
-                $handle = fopen('php://output', 'w');
-
-                // Thêm BOM UTF-8 để Excel nhận đúng tiếng Việt
-                fwrite($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
-
-                // Header
-                fputcsv($handle, [
-                    'id',
-                    'name',
-                    'description',
-                    'price',
-                    'image',
-                    'category_name',
-                    'is_active',
-                    'stock',
-                    'discount',
-                    'size',
-                    'options',
-                    'toppings'
-                ]);
-                // Data
-                $products = $this->productService->getAllProductsForExport($params);
-                foreach ($products as $product) {
-                    $transformed = $product->transform();
-                    // options: name:value,name:value,...
-                    $options = collect($transformed['options'])->map(function ($option) {
-                        $values = collect($option['values'])->map(function ($v) {
-                            return $v['value'];
-                        })->implode('|');
-                        return $option['name'] . ($values ? (':' . $values) : '');
-                    })->implode(',');
-                    // toppings: name|price,name|price,...
-                    $toppings = collect($transformed['toppings'])->map(function ($topping) {
-                        return $topping['name'] . (isset($topping['price']) ? ('|' . $topping['price']) : '');
-                    })->implode(',');
-                    fputcsv($handle, [
-                        $transformed['id'],
-                        $transformed['name'],
-                        $transformed['description'],
-                        $transformed['price'],
-                        $transformed['image'],
-                        $transformed['category_name'],
-                        $product->is_active,
-                        $transformed['stock'],
-                        $transformed['discount'],
-                        json_encode($transformed['size']),
-                        $options,
-                        $toppings,
-                    ]);
-                }
-                fclose($handle);
-            };
-            return response()->stream($callback, 200, $headers);
-        } catch (\Exception $e) {
-            return APIResponse::error('Export failed: ' . $e->getMessage(), 500);
-        }
+        $params = $request->only([
+            'q',
+            'category_id',
+            'sort_by',
+            'sort_order',
+            'per_page',
+            'take',
+        ]);
+        return $this->productService->exportProductsCsv($params);
     }
 
     public function importCsv(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'file' => 'required|file|mimes:csv,txt',
+            'file' => 'required|file|mimes:xlsx,csv,txt',
         ]);
         if ($validator->fails()) {
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
 
-        $file = $request->file('file');
-        $handle = fopen($file->getRealPath(), 'r');
-        $header = fgetcsv($handle);
-
-        $results = [
-            'created' => [],
-            'updated' => [],
-            'errors' => [],
-        ];
-
-        DB::beginTransaction();
         try {
-            while (($row = fgetcsv($handle)) !== false) {
-                $data = array_combine($header, $row);
-
-                // Parse fields
-                $data['size'] = $data['size'] ? json_decode($data['size'], true) : [];
-                $data['options'] = $data['options'] ? explode(',', $data['options']) : [];
-                $data['toppings'] = $data['toppings'] ? explode(',', $data['toppings']) : [];
-
-                // Validate each row (basic)
-                $rowValidator = Validator::make($data, [
-                    'name' => 'required|string|max:255',
-                    'description' => 'required|string',
-                    'price' => 'required|numeric|min:0',
-                    'image' => 'required|string',
-                    'category_id' => 'required|exists:categories,id',
-                    'stock' => 'required|integer|min:0',
-                    'discount' => 'nullable|numeric|min:0',
-                ]);
-                if ($rowValidator->fails()) {
-                    $results['errors'][] = [
-                        'row' => $data,
-                        'errors' => $rowValidator->errors()->all(),
-                    ];
-                    continue;
-                }
-
-                // Create or update
-                if (!empty($data['id'])) {
-                    $result = $this->productService->updateOrCreateProduct($data, true);
-                    $results['updated'][] = $result;
-                } else {
-                    $result = $this->productService->updateOrCreateProduct($data, false);
-                    $results['created'][] = $result;
-                }
-            }
-            DB::commit();
+            $results = $this->productService->importProductsFromFile($request->file('file'));
         } catch (\Exception $e) {
-            DB::rollBack();
+            Log::error($e->getMessage());
             return APIResponse::error('Import failed: ' . $e->getMessage(), 500);
-        } finally {
-            fclose($handle);
         }
 
         return APIResponse::success($results, 'Import completed', 200);
+    }
+
+    // Export Excel template for import (3 sheets)
+    public function exportImportTemplate()
+    {
+        try {
+            return $this->productService->exportImportTemplateExcel();
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return APIResponse::error('Export failed: ' . $e->getMessage(), 500);
+        }
     }
 }
