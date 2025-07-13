@@ -269,7 +269,7 @@
         </header>
         <main
             v-if="$route.path === '/'"
-            class="max-w-[1280px] mx-auto sm:px-6 lg:px-8 mt-6 sm:pt-32"
+            class="max-w-[1280px] mx-auto sm:px-6 lg:px-8 sm:pt-32"
         >
             <section
                 class="flex flex-col lg:flex-row gap-6 bg-[#f9f9f9] rounded-md overflow-hidden"
