@@ -1,25 +1,32 @@
-import { ref, onMounted } from "vue";
+import { ref, watch, onMounted } from "vue";
 
 export function useDarkMode() {
     const isDark = ref(false);
 
-    const toggleDarkMode = () => {
-        if (isDark.value) {
-            // Chuyển sang light mode
-            localStorage.theme = "light";
-            document.documentElement.classList.remove("dark");
-        } else {
-            // Chuyển sang dark mode
-            localStorage.theme = "dark";
-            document.documentElement.classList.add("dark");
-        }
-        isDark.value = !isDark.value;
-    };
-
+    // Lấy giá trị từ localStorage khi khởi tạo
     onMounted(() => {
-        // Kiểm tra theme khi component được mount
-        isDark.value = document.documentElement.classList.contains("dark");
+        const savedTheme = localStorage.getItem("darkMode");
+        if (savedTheme !== null) {
+            isDark.value = JSON.parse(savedTheme);
+        } else {
+            // Kiểm tra system preference nếu chưa có setting
+            const prefersDark = window.matchMedia(
+                "(prefers-color-scheme: dark)"
+            ).matches;
+            isDark.value = prefersDark;
+        }
     });
+
+    // Theo dõi thay đổi và lưu vào localStorage
+    watch(isDark, (newValue) => {
+        localStorage.setItem("darkMode", JSON.stringify(newValue));
+    });
+
+    // Toggle dark mode
+    const toggleDarkMode = () => {
+        isDark.value = !isDark.value;
+        window.location.reload();
+    };
 
     return {
         isDark,

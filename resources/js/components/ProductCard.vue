@@ -1,6 +1,7 @@
 <template>
     <div
-        class="w-[150px] h-[240px] bg-white rounded-md shadow-lg p-4 flex flex-col items-center transition-all duration-300 group overflow-hidden"
+        class="w-[150px] h-[240px] rounded-md shadow-lg p-4 flex flex-col items-center transition-all duration-300 group overflow-hidden"
+        :class="isDark ? 'bg-gray-800' : 'bg-white'"
     >
         <!-- Image + Wishlist + Action buttons -->
         <div class="relative w-full h-[180px] overflow-hidden group">
@@ -12,8 +13,11 @@
                 />
             </router-link>
             <div
-                class="absolute top-2 right-2 text-gray-400 cursor-pointer"
-                :class="{ 'text-[#d80000]': product.is_favorite }"
+                class="absolute top-2 right-2 cursor-pointer"
+                :class="[
+                    isDark ? 'text-gray-500' : 'text-gray-400',
+                    { 'text-[#d80000]': product.is_favorite },
+                ]"
                 :title="
                     product.is_favorite
                         ? 'Remove from wishlist'
@@ -54,8 +58,13 @@
 
         <!-- Product Name & Price -->
         <div class="mt-3 w-full flex justify-between items-center text-sm">
-            <div class="font-semibold truncate">{{ product.name }}</div>
-            <div class="text-gray-700">
+            <div
+                class="font-semibold truncate"
+                :class="isDark ? 'text-white' : 'text-gray-900'"
+            >
+                {{ product.name }}
+            </div>
+            <div :class="isDark ? 'text-gray-300' : 'text-gray-700'">
                 {{
                     selectedSize
                         ? selectedSize.price.toLocaleString()
@@ -67,16 +76,23 @@
         <!-- Sizes -->
         <div
             v-if="product.size && product.size.length > 0"
-            class="mt-2 w-full flex justify-end gap-2 text-gray-400 text-xs"
+            class="mt-2 w-full flex justify-end gap-2 text-xs"
+            :class="isDark ? 'text-gray-500' : 'text-gray-400'"
         >
             <div
                 v-for="(s, index) in product.size"
                 :key="index"
-                class="border border-gray-300 rounded-full w-6 h-6 flex items-center justify-center cursor-pointer transition hover:bg-gray-200 hover:border-gray-500"
-                :class="{
-                    'bg-gray-300 border-gray-600 text-black':
-                        selectedSize?.label === s.label,
-                }"
+                class="border rounded-full w-6 h-6 flex items-center justify-center cursor-pointer transition"
+                :class="[
+                    isDark
+                        ? 'border-gray-600 hover:bg-gray-700 hover:border-gray-500'
+                        : 'border-gray-300 hover:bg-gray-200 hover:border-gray-500',
+                    selectedSize?.label === s.label
+                        ? isDark
+                            ? 'bg-gray-600 border-gray-500 text-white'
+                            : 'bg-gray-300 border-gray-600 text-black'
+                        : '',
+                ]"
                 :title="s.label"
                 @click="selectedSize = s"
             >
@@ -89,9 +105,11 @@
 <script setup>
 import { ref, watch } from "vue";
 import axios from "axios";
+import { useDarkMode } from "../composables/useDarkMode.js";
 
 const props = defineProps(["product"]);
 const selectedSize = ref(null);
+const { isDark } = useDarkMode();
 
 if (props.product?.size?.length > 0) {
     selectedSize.value = props.product.size[0];

@@ -1,15 +1,21 @@
 <template>
-    <div class="bg-white">
+    <div
+        class="transition-colors duration-300"
+        :class="isDark ? 'bg-gray-900' : 'bg-white'"
+    >
         <header
-            class="fixed top-0 left-0 right-0 bg-white z-50 max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8"
+            class="fixed top-0 left-0 right-0 z-50 max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 transition-colors duration-300"
+            :class="isDark ? 'bg-gray-900' : 'bg-white'"
         >
             <div
-                class="flex items-center justify-between py-6 border-b border-gray-200 mobile-header-row"
+                class="flex items-center justify-between py-6 mobile-header-row border-b"
+                :class="isDark ? 'border-gray-700' : 'border-gray-200'"
             >
                 <router-link to="/" class="flex items-center space-x-6">
                     <div class="flex items-center space-x-1">
                         <h1
-                            class="text-2xl font-extrabold text-black flex items-center gap-1 mobile-logo"
+                            class="text-2xl font-extrabold flex items-center gap-1 mobile-logo"
+                            :class="isDark ? 'text-white' : 'text-black'"
                         >
                             <span> CheeseCake </span>
                             <svg
@@ -116,11 +122,17 @@
                 >
                     <SearchDropdown />
                 </form>
-                <div class="flex items-center space-x-6 text-gray-600 text-lg">
+                <div
+                    class="flex items-center space-x-6 text-lg"
+                    :class="isDark ? 'text-gray-400' : 'text-gray-600'"
+                >
                     <UserMenu />
                     <router-link
                         to="/cart"
-                        class="relative hover:text-black transition"
+                        class="relative transition"
+                        :class="
+                            isDark ? 'hover:text-white' : 'hover:text-black'
+                        "
                         aria-label="Shopping bag"
                     >
                         <svg
@@ -157,22 +169,29 @@
                     </router-link>
                 </div>
             </div>
-            <nav class="flex items-center space-x-4 border-b border-gray-200">
+            <nav
+                class="flex items-center space-x-4 border-b"
+                :class="isDark ? 'border-gray-700' : 'border-gray-200'"
+            >
                 <button
                     class="flex items-center gap-2 bg-[#eeb600] text-white text-xs font-semibold px-5 py-3 rounded-md"
                     type="button"
                 >
                     DANH MỤC
                 </button>
-                <ul class="flex space-x-6 text-sm font-medium text-gray-800">
+                <ul
+                    class="flex space-x-6 text-sm font-medium"
+                    :class="isDark ? 'text-gray-200' : 'text-gray-800'"
+                >
                     <li>
                         <router-link
                             to="/"
                             :class="[
                                 'pb-1 inline-block',
                                 $route.path === '/'
-                                    ? 'border-b-2 border-black font-semibold'
+                                    ? 'font-semibold border-b-2'
                                     : 'hover:underline',
+                                isDark ? 'border-white' : 'border-black',
                             ]"
                         >
                             Trang chủ
@@ -184,8 +203,9 @@
                             :class="[
                                 'pb-1 inline-block',
                                 $route.path === '/about'
-                                    ? 'border-b-2 border-black font-semibold'
+                                    ? 'font-semibold border-b-2'
                                     : 'hover:underline',
+                                isDark ? 'border-white' : 'border-black',
                             ]"
                         >
                             Giới thiệu
@@ -197,8 +217,9 @@
                             :class="[
                                 'pb-1 inline-block',
                                 $route.path === '/story'
-                                    ? 'border-b-2 border-black font-semibold'
+                                    ? 'font-semibold border-b-2'
                                     : 'hover:underline',
+                                isDark ? 'border-white' : 'border-black',
                             ]"
                         >
                             Câu chuyện
@@ -462,8 +483,9 @@
 </style>
 
 <script>
-import UserMenu from "./UserMenu.vue";
 import SearchDropdown from "./SearchDropdown.vue";
+import UserMenu from "./UserMenu.vue";
+import { useDarkMode } from "../composables/useDarkMode.js";
 
 export default {
     name: "CheeseCake",
@@ -476,15 +498,12 @@ export default {
             cartCount: 0,
             baseImageUrl: import.meta.env.VITE_RESPONE_IMAGE_URL,
             showMobileNav: false,
+            isDark: useDarkMode().isDark,
         };
     },
     mounted() {
         this.updateCartCount();
-
-        // Nếu có nhiều tab, sẽ bắt được sự kiện thay đổi localStorage
         window.addEventListener("storage", this.updateCartCount);
-
-        // Optionally: Có thể tạo một custom event để dùng trong cùng tab
         window.addEventListener("cart-updated", this.updateCartCount);
     },
     beforeUnmount() {

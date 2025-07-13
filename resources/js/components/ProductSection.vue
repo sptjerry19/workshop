@@ -6,19 +6,30 @@
         </div>
     </section> -->
     <div
-        class="relative max-w-[1200px] mx-auto px-4 py-8 mt-20 product-section-mobile"
+        class="relative max-w-[1200px] mx-auto px-4 py-8 mt-20 product-section-mobile transition-colors duration-300"
+        :class="isDark ? 'bg-gray-900' : 'bg-white'"
     >
-        <h2 class="text-lg font-semibold">{{ title }}</h2>
+        <h2
+            class="text-lg font-semibold"
+            :class="isDark ? 'text-white' : 'text-gray-900'"
+        >
+            {{ title }}
+        </h2>
         <!-- Tabs on top right -->
         <div
-            class="flex absolute top-3 right-8 justify-end gap-8 mt-6 text-sm text-gray-400 font-semibold max-w-[1200px] mx-auto"
+            class="flex absolute top-3 right-8 justify-end gap-8 mt-6 text-sm font-semibold max-w-[1200px] mx-auto"
+            :class="isDark ? 'text-gray-500' : 'text-gray-400'"
         >
             <div
                 @click="handleCallProduct('created_at')"
                 :class="[
                     'cursor-pointer transition-all duration-200',
                     activeTab === 'created_at'
-                        ? 'text-black underline underline-offset-4 decoration-2 decoration-black'
+                        ? isDark
+                            ? 'text-white underline underline-offset-4 decoration-2 decoration-white'
+                            : 'text-black underline underline-offset-4 decoration-2 decoration-black'
+                        : isDark
+                        ? 'hover:font-semibold hover:underline hover:underline-offset-4 hover:decoration-2 hover:decoration-white'
                         : 'hover:font-semibold hover:underline hover:underline-offset-4 hover:decoration-2 hover:decoration-black',
                 ]"
             >
@@ -29,7 +40,11 @@
                 :class="[
                     'cursor-pointer transition-all duration-200',
                     activeTab === 'sold'
-                        ? 'text-black underline underline-offset-4 decoration-2 decoration-black'
+                        ? isDark
+                            ? 'text-white underline underline-offset-4 decoration-2 decoration-white'
+                            : 'text-black underline underline-offset-4 decoration-2 decoration-black'
+                        : isDark
+                        ? 'hover:font-semibold hover:underline hover:underline-offset-4 hover:decoration-2 hover:decoration-white'
                         : 'hover:font-semibold hover:underline hover:underline-offset-4 hover:decoration-2 hover:decoration-black',
                 ]"
             >
@@ -40,7 +55,11 @@
                 :class="[
                     'cursor-pointer transition-all duration-200',
                     activeTab === 'discount'
-                        ? 'text-black underline underline-offset-4 decoration-2 decoration-black'
+                        ? isDark
+                            ? 'text-white underline underline-offset-4 decoration-2 decoration-white'
+                            : 'text-black underline underline-offset-4 decoration-2 decoration-black'
+                        : isDark
+                        ? 'hover:font-semibold hover:underline hover:underline-offset-4 hover:decoration-2 hover:decoration-white'
                         : 'hover:font-semibold hover:underline hover:underline-offset-4 hover:decoration-2 hover:decoration-black',
                 ]"
             >
@@ -75,6 +94,7 @@
                 <div
                     v-if="!products || products.length === 0"
                     class="text-center py-8"
+                    :class="isDark ? 'text-gray-400' : 'text-gray-600'"
                 >
                     Không có sản phẩm nào
                 </div>
@@ -92,7 +112,12 @@
                     <div class="flex justify-center mt-4">
                         <router-link
                             to="/products"
-                            class="inline-flex items-center px-6 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            class="inline-flex items-center px-6 py-2 border rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+                            :class="
+                                isDark
+                                    ? 'border-gray-600 text-gray-300 bg-gray-800 hover:bg-gray-700'
+                                    : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
+                            "
                         >
                             Xem thêm
                             <svg
@@ -115,11 +140,19 @@
                     <div class="flex justify-center gap-4 mt-4">
                         <button
                             @click="prevSlide"
-                            class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
+                            class="p-2 rounded-full disabled:opacity-50 transition-colors duration-200"
+                            :class="
+                                isDark
+                                    ? 'bg-gray-700 hover:bg-gray-600'
+                                    : 'bg-gray-100 hover:bg-gray-200'
+                            "
                             :disabled="currentSlide === 0"
                         >
                             <svg
                                 class="w-6 h-6"
+                                :class="
+                                    isDark ? 'text-gray-300' : 'text-gray-600'
+                                "
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -134,11 +167,19 @@
                         </button>
                         <button
                             @click="nextSlide"
-                            class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
+                            class="p-2 rounded-full disabled:opacity-50 transition-colors duration-200"
+                            :class="
+                                isDark
+                                    ? 'bg-gray-700 hover:bg-gray-600'
+                                    : 'bg-gray-100 hover:bg-gray-200'
+                            "
                             :disabled="currentSlide >= maxSlides"
                         >
                             <svg
                                 class="w-6 h-6"
+                                :class="
+                                    isDark ? 'text-gray-300' : 'text-gray-600'
+                                "
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -162,6 +203,7 @@
 import { ref, computed } from "vue";
 import axios from "axios";
 import ProductCard from "./ProductCard.vue";
+import { useDarkMode } from "../composables/useDarkMode.js";
 
 const props = defineProps(["title", "products"]);
 const emit = defineEmits(["update:products"]);
@@ -169,6 +211,7 @@ const currentSlide = ref(0);
 const activeTab = ref("created_at"); // Default active tab
 const productsPerPage = 10; // 5 products per row * 2 rows
 
+const { isDark } = useDarkMode();
 const baseImageUrl = import.meta.env.VITE_RESPONE_IMAGE_URL;
 
 const maxSlides = computed(() => {

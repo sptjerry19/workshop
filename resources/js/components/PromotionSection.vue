@@ -1,9 +1,18 @@
 <template>
-    <section class="my-8 flex max-h-120 promotion-section-mobile">
+    <section
+        class="my-8 flex max-h-120 promotion-section-mobile transition-colors duration-300"
+        :class="isDark ? 'bg-gray-900' : 'bg-white'"
+    >
         <div
-            class="w-1/4 bg-gray-100 rounded-lg flex flex-col items-center justify-center p-8 mr-4 promo-block"
+            class="w-1/4 rounded-lg flex flex-col items-center justify-center p-8 mr-4 promo-block"
+            :class="isDark ? 'bg-gray-800' : 'bg-gray-100'"
         >
-            <h3 class="font-bold text-lg mb-2">Khuyến mãi</h3>
+            <h3
+                class="font-bold text-lg mb-2"
+                :class="isDark ? 'text-white' : 'text-gray-900'"
+            >
+                Khuyến mãi
+            </h3>
             <img
                 :src="baseImageUrl + 'discount.png'"
                 class="h-30 max-h-40 rounded-lg"
@@ -17,7 +26,10 @@
 
 <script setup>
 import ProductCard from "./ProductCard.vue";
+import { useDarkMode } from "../composables/useDarkMode.js";
+
 const baseImageUrl = import.meta.env.VITE_RESPONE_IMAGE_URL;
+const { isDark } = useDarkMode();
 
 defineProps(["products"]);
 </script>

@@ -1,12 +1,16 @@
 <template>
     <button
         @click="toggleDarkMode"
-        class="fixed top-0 right-4 p-2 rounded-full bg-gray-200 dark:bg-gray-700 transition-colors duration-200"
+        class="fixed top-4 right-4 z-50 p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 border"
+        :class="
+            isDark ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
+        "
+        :title="isDark ? 'Chuyển sang chế độ sáng' : 'Chuyển sang chế độ tối'"
     >
-        <!-- Sun icon -->
+        <!-- Sun icon for light mode -->
         <svg
-            v-if="isDark"
-            class="w-6 h-6 text-yellow-500"
+            v-if="!isDark"
+            class="w-6 h-6 text-yellow-500 transition-all duration-300"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -18,10 +22,11 @@
                 d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
             />
         </svg>
-        <!-- Moon icon -->
+
+        <!-- Moon icon for dark mode -->
         <svg
             v-else
-            class="w-6 h-6 text-gray-700"
+            class="w-6 h-6 text-blue-400 transition-all duration-300"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -37,27 +42,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { useDarkMode } from "../composables/useDarkMode";
 
-const isDark = ref(false);
-
-const toggleDarkMode = () => {
-    isDark.value = !isDark.value;
-    if (isDark.value) {
-        document.documentElement.classList.add("dark");
-        localStorage.setItem("darkMode", "true");
-    } else {
-        document.documentElement.classList.remove("dark");
-        localStorage.setItem("darkMode", "false");
-    }
-};
-
-onMounted(() => {
-    // Check for saved dark mode preference
-    const savedDarkMode = localStorage.getItem("darkMode");
-    if (savedDarkMode === "true") {
-        isDark.value = true;
-        document.documentElement.classList.add("dark");
-    }
-});
+const { isDark, toggleDarkMode } = useDarkMode();
 </script>

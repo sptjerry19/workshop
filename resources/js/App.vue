@@ -1,5 +1,9 @@
 <template>
-    <div>
+    <div
+        class="min-h-screen transition-colors duration-300"
+        :class="isDark ? 'bg-gray-900' : 'bg-white'"
+    >
+        <DarkModeToggle />
         <router-view></router-view>
         <Notification />
         <LoadingOverlay />
@@ -13,10 +17,14 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import Notification from "./components/Notification.vue";
 import LoadingOverlay from "./components/LoadingOverlay.vue";
+import DarkModeToggle from "./components/DarkModeToggle.vue";
+import { useDarkMode } from "./composables/useDarkMode.js";
 import Echo from "laravel-echo";
 import Pusher from "pusher-js";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
+
+const { isDark } = useDarkMode();
 
 // Configure Pusher
 window.Pusher = Pusher;

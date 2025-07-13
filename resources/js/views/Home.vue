@@ -1,5 +1,8 @@
 <template>
-    <div>
+    <div
+        class="transition-colors duration-300"
+        :class="isDark ? 'bg-gray-900' : 'bg-white'"
+    >
         <!-- <Header /> -->
         <Banner />
         <!-- <CategoryList /> -->
@@ -26,9 +29,11 @@ import ProductSection from "../components/ProductSection.vue";
 import PromotionSection from "../components/PromotionSection.vue";
 import Footer from "../components/Footer.vue";
 import ChatBox from "../components/ChatBox.vue";
+import { useDarkMode } from "../composables/useDarkMode.js";
 
 import api from "../api.js";
 
+const { isDark } = useDarkMode();
 const products = ref([]);
 const productsPromote = ref([]);
 

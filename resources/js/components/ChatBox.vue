@@ -25,7 +25,8 @@
         <!-- Chat Window -->
         <div
             v-if="isOpen"
-            class="bg-white rounded-lg shadow-xl w-96 h-[500px] flex flex-col"
+            class="rounded-lg shadow-xl w-96 h-[500px] flex flex-col transition-colors duration-300"
+            :class="isDark ? 'bg-gray-800' : 'bg-white'"
         >
             <!-- Header -->
             <div
@@ -57,9 +58,14 @@
             <div
                 ref="messagesContainer"
                 class="flex-1 overflow-y-auto p-4 space-y-4"
+                :class="isDark ? 'bg-gray-800' : 'bg-white'"
                 @scroll="handleScroll"
             >
-                <div v-if="loading" class="text-center text-gray-500">
+                <div
+                    v-if="loading"
+                    class="text-center"
+                    :class="isDark ? 'text-gray-400' : 'text-gray-500'"
+                >
                     Đang tải tin nhắn...
                 </div>
                 <template v-else>
@@ -78,6 +84,8 @@
                                 'max-w-[80%] rounded-lg p-3',
                                 message.from_sender_id === userId
                                     ? 'bg-[#eeb600] text-white'
+                                    : isDark
+                                    ? 'bg-gray-700 text-gray-200'
                                     : 'bg-gray-100 text-gray-800',
                             ]"
                         >
@@ -91,13 +99,25 @@
             </div>
 
             <!-- Input -->
-            <div class="p-4 border-t">
+            <div
+                class="p-4 border-t"
+                :class="
+                    isDark
+                        ? 'border-gray-700 bg-gray-800'
+                        : 'border-gray-200 bg-white'
+                "
+            >
                 <form @submit.prevent="sendMessage" class="flex gap-2">
                     <input
                         v-model="newMessage"
                         type="text"
                         placeholder="Nhập tin nhắn..."
-                        class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#eeb600] focus:border-transparent"
+                        class="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#eeb600] focus:border-transparent transition-colors duration-200"
+                        :class="
+                            isDark
+                                ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                                : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                        "
                         :disabled="!userId"
                     />
                     <button
@@ -131,7 +151,9 @@ import { ref, onMounted, nextTick, watch } from "vue";
 import axios from "axios";
 import Echo from "laravel-echo";
 import Pusher from "pusher-js";
+import { useDarkMode } from "../composables/useDarkMode.js";
 
+const { isDark } = useDarkMode();
 const isOpen = ref(false);
 const messages = ref([]);
 const newMessage = ref("");
